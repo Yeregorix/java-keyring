@@ -14,6 +14,10 @@ Support for Linux is planned, but not implemented yet.
     * Passwords are encrypted by [Data Protection API](http://msdn.microsoft.com/en-us/library/ms995355.aspx) 
       and stored in a file using [ObjectOutputStream](http://docs.oracle.com/javase/6/docs/api/java/io/ObjectOutputStream.html) etc.
 
+If you find bug, please let me know via [issue tracker](http://bitbucket.org/east301/java-keyring/issues)
+or twitter [@east301](http://twitter.com/east301). In addition, any patch/modification is highly welcome.
+
+
 
 Source code tree
 ----------------
