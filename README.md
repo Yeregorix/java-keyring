@@ -25,12 +25,16 @@ Source code tree
 java-keyring package contains the following directories
 
 * __java-keyring__ directory
-    * java-keyring library source code with [NetBeans](http://netbeans.org) project file
+    * java-keyring library source code
 * __java-keyring-example__ directory
     * usage example of java-keyring library
-* __lib__ directory
-    * copy of JNA library
 
+Building
+--------
+
+```
+mvn clean install
+```
 
 License
 -------
