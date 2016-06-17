@@ -7,14 +7,13 @@
     <parent>
         <artifactId>java-keyring-parent</artifactId>
         <groupId>net.east301</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.east301</groupId>
     <artifactId>java-keyring-example</artifactId>
-    <version>1.0.0</version>
     <name>java-keyring-example</name>
     <description>Example of java-keyring library</description>
     <url>https://bitbucket.org/east301/java-keyring/</url>
@@ -133,6 +132,7 @@
         <dependency>
             <groupId>net.east301</groupId>
             <artifactId>java-keyring</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

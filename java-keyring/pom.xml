@@ -7,14 +7,12 @@
     <parent>
         <artifactId>java-keyring-parent</artifactId>
         <groupId>net.east301</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>net.east301</groupId>
     <artifactId>java-keyring</artifactId>
-    <version>1.0.0</version>
     <name>java-keyring</name>
     <description>A Java library to store password securely</description>
     <url>https://bitbucket.org/east301/java-keyring/</url>
@@ -137,7 +135,7 @@
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
-            <artifactId>platform</artifactId>
+            <artifactId>jna-platform</artifactId>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
