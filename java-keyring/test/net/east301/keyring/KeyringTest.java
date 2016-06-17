@@ -8,6 +8,8 @@ package net.east301.keyring;
 
 import com.sun.jna.Platform;
 import java.io.File;
+
+import net.east301.keyring.gnome.GNOMEKeyringBackend;
 import net.east301.keyring.memory.UncryptedMemoryBackend;
 import net.east301.keyring.osx.OSXKeychainBackend;
 import net.east301.keyring.windows.WindowsDPAPIBackend;
@@ -77,6 +79,8 @@ public class KeyringTest {
             assertTrue(keyring.getBackend() instanceof OSXKeychainBackend);
         } else if (Platform.isWindows()) {
             assertTrue(keyring.getBackend() instanceof WindowsDPAPIBackend);
+        } else if (Platform.isLinux()) {
+            assertTrue(keyring.getBackend() instanceof GNOMEKeyringBackend);
         } else {
             assertTrue(keyring.getBackend() instanceof UncryptedMemoryBackend);
         }

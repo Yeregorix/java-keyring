@@ -7,6 +7,8 @@
 package net.east301.keyring;
 
 import java.util.ArrayList;
+
+import net.east301.keyring.gnome.GNOMEKeyringBackend;
 import net.east301.keyring.memory.UncryptedMemoryBackend;
 import net.east301.keyring.osx.OSXKeychainBackend;
 import net.east301.keyring.windows.WindowsDPAPIBackend;
@@ -113,6 +115,7 @@ class KeyringBackendFactory {
      */
     private static Object[][] KEYRING_BACKENDS = {
         { "OSXKeychain",        OSXKeychainBackend.class },
+        { "GNOMEKeyring",		GNOMEKeyringBackend.class },
         { "WindowsDPAPI",       WindowsDPAPIBackend.class },
         { "UncryptedMemory",    UncryptedMemoryBackend.class }
     };

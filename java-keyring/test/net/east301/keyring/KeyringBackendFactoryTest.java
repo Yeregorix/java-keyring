@@ -8,6 +8,8 @@ package net.east301.keyring;
 
 import com.sun.jna.Platform;
 import java.util.Arrays;
+
+import net.east301.keyring.gnome.GNOMEKeyringBackend;
 import net.east301.keyring.memory.UncryptedMemoryBackend;
 import net.east301.keyring.osx.OSXKeychainBackend;
 import net.east301.keyring.windows.WindowsDPAPIBackend;
@@ -34,6 +36,8 @@ public class KeyringBackendFactoryTest {
             assertTrue(backend instanceof OSXKeychainBackend);
         } else if (Platform.isWindows()) {
             assertTrue(backend instanceof WindowsDPAPIBackend);
+        } else if (Platform.isLinux()) {
+            assertTrue(backend instanceof GNOMEKeyringBackend);
         } else {
             fail("Unsupported platform");
         }
@@ -102,9 +106,10 @@ public class KeyringBackendFactoryTest {
         String[] backends = KeyringBackendFactory.getAllBackendNames();
 
         //
-        assertTrue(backends.length == 3);
+        assertTrue(backends.length == 4);
         assertTrue(Arrays.asList(backends).contains("OSXKeychain"));
         assertTrue(Arrays.asList(backends).contains("WindowsDPAPI"));
+        assertTrue(Arrays.asList(backends).contains("GNOMEKeyring"));
         assertTrue(Arrays.asList(backends).contains("UncryptedMemory"));
     }
 
