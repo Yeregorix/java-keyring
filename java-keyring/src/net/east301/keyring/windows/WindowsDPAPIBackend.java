@@ -185,10 +185,13 @@ public class WindowsDPAPIBackend extends KeyringBackend {
         ArrayList<PasswordEntry> entries = new ArrayList<PasswordEntry>();
 
         try {
-            FileInputStream fin = new FileInputStream(m_keyStorePath);
-            ObjectInputStream oin = new ObjectInputStream(fin);
-
-            entries.addAll(Arrays.asList((PasswordEntry[])oin.readObject()));
+        	ObjectInputStream fin = new ObjectInputStream(new FileInputStream(m_keyStorePath));
+            try {
+            	entries.addAll(Arrays.asList((PasswordEntry[])fin.readObject()));
+            }
+            finally {
+            	fin.close();
+            }
         } catch (Exception ex) {
             Logger.getLogger(WindowsDPAPIBackend.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -208,10 +211,14 @@ public class WindowsDPAPIBackend extends KeyringBackend {
             throws PasswordSaveException {
 
         try {
-            FileOutputStream fout = new FileOutputStream(m_keyStorePath);
-            ObjectOutputStream oout = new ObjectOutputStream(fout);
-
-            oout.writeObject(entries.toArray(new PasswordEntry[0]));
+            ObjectOutputStream fout = new ObjectOutputStream(new FileOutputStream(m_keyStorePath));
+            try {
+	            fout.writeObject(entries.toArray(new PasswordEntry[0]));
+	            fout.flush();
+            }
+            finally {
+            	fout.close();
+            }
         } catch (Exception ex) {
             Logger.getLogger(WindowsDPAPIBackend.class.getName()).log(Level.SEVERE, null, ex);
             throw new PasswordSaveException("Failed to save password entries to a file");
