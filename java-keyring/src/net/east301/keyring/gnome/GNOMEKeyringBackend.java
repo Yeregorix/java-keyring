@@ -29,6 +29,8 @@ import net.east301.keyring.PasswordSaveException;
 /**
  * Keyring backend which uses GNOME Keyring
  */
+// TODO Abgleichen bitte !!!
+// https://github.com/apache/incubator-netbeans/blob/master/keyring.impl/src/org/netbeans/modules/keyring/gnome/GnomeProvider.java
 public class GNOMEKeyringBackend extends KeyringBackend {
 	
     @Override

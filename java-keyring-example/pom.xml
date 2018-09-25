@@ -18,7 +18,11 @@
     <description>Example of java-keyring library</description>
     <url>https://bitbucket.org/east301/java-keyring/</url>
     <packaging>jar</packaging>
-
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
     <licenses>
         <license>
             <name>The BSD 3-Clause License</name>
@@ -123,7 +127,7 @@
                     <charset>UTF-8</charset>
                     <show>public</show>
                 </configuration>
-                <version>2.7</version>
+                <version>3.0.1</version>
             </plugin>
         </plugins>
     </build>
