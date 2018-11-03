@@ -15,7 +15,9 @@ import com.sun.jna.ptr.PointerByReference;
  * GKLib
  */
 interface GKLib extends Library {
-
+		
+	int gnome_keyring_unlock_sync(String keyring, String password);
+	
 	int gnome_keyring_item_get_info_full_sync(String keyring, int id, int flags, PointerByReference item_info);
 
 	void gnome_keyring_item_info_free(Pointer item_info);

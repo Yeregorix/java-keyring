@@ -29,14 +29,17 @@ import net.east301.keyring.PasswordSaveException;
 /**
  * Keyring backend which uses GNOME Keyring
  */
-// TODO Abgleichen bitte !!!
-// https://github.com/apache/incubator-netbeans/blob/master/keyring.impl/src/org/netbeans/modules/keyring/gnome/GnomeProvider.java
 public class GNOMEKeyringBackend extends KeyringBackend {
 	
     @Override
     public void setup() throws BackendNotSupportedException {
         NativeLibraryManager.loadNativeLibraries();
         
+        // unlock default keyring
+		int result = NativeLibraryManager.gklib.gnome_keyring_unlock_sync(null, null);
+		if (result != 0) {
+			throw new BackendNotSupportedException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));
+		}
     }
 
     /**
@@ -101,7 +104,8 @@ public class GNOMEKeyringBackend extends KeyringBackend {
     public void setPassword(String service, String account, String password)
             throws PasswordSaveException {
     	IntByReference ref = new IntByReference();
-    	int result = NativeLibraryManager.gklib.gnome_keyring_set_network_password_sync(null, account, null, service, null, null, null, 0,
+    	int result = NativeLibraryManager.gklib.gnome_keyring_set_network_password_sync(null, account, 
+    			null, service, null, null, null, 0,
     			password, ref);
 		if (result != 0) {
 			throw new PasswordSaveException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));

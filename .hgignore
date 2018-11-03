@@ -9,4 +9,6 @@ java-keyring-example/nbproject/private
 .idea
 *.iml
 *.versionsBackup
-
+.project
+.settings
+.classpath
