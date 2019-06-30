@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 class PasswordEntry implements Serializable {
 
-    public static final long serialVersionUID = -3158477865959025220;
+    public static final long serialVersionUID = -3158477865959025220L;
 
     /**
      * Service name
