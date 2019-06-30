@@ -1,6 +1,5 @@
 package net.east301.keyring.memory;
 
-import net.east301.keyring.PasswordRetrievalException;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -30,9 +29,9 @@ public class UncryptedMemoryBackendTest {
      * Test of getPassword method, of class UncryptedMemoryBackend
      * by retrieving invalid entry.
      */
-    @Test(expected = PasswordRetrievalException.class)
-    public void testGetPassword_InvalidPassword() throws Exception {
-        new UncryptedMemoryBackend().getPassword(SERVICE, ACCOUNT);
+    @Test
+    public void testGetPassword_InvalidPassword() {
+       assertNull(new UncryptedMemoryBackend().getPassword(SERVICE, ACCOUNT));
     }
 
     /**
@@ -40,7 +39,7 @@ public class UncryptedMemoryBackendTest {
      * by retrieving valid entry.
      */
     @Test
-    public void testGetPassword_ValidPassword() throws Exception {
+    public void testGetPassword_ValidPassword() {
         UncryptedMemoryBackend instance = new UncryptedMemoryBackend();
         instance.setPassword(SERVICE, ACCOUNT, PASSWORD);
         assertEquals(PASSWORD, instance.getPassword(SERVICE, ACCOUNT));
@@ -50,7 +49,7 @@ public class UncryptedMemoryBackendTest {
      * Test of setPassword method, of class UncryptedMemoryBackend.
      */
     @Test
-    public void testSetPassword() throws Exception {
+    public void testSetPassword() {
         UncryptedMemoryBackend instance = new UncryptedMemoryBackend();
         instance.setPassword(SERVICE, ACCOUNT, PASSWORD);
         assertEquals(PASSWORD, instance.getPassword(SERVICE, ACCOUNT));
@@ -65,9 +64,6 @@ public class UncryptedMemoryBackendTest {
     }
 
     private static final String SERVICE = "net.east301.keyring.memory unit test";
-
     private static final String ACCOUNT = "tester";
-
     private static final String PASSWORD = "HogeHoge2012";
-
 }

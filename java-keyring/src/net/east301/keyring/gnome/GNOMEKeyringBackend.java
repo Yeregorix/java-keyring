@@ -7,17 +7,25 @@ import net.east301.keyring.BackendNotSupportedException;
 import net.east301.keyring.KeyringBackend;
 import net.east301.keyring.PasswordRetrievalException;
 import net.east301.keyring.PasswordSaveException;
+import net.east301.keyring.util.ServiceAndAccount;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Keyring backend which uses GNOME Keyring
  */
 public class GNOMEKeyringBackend extends KeyringBackend {
+
+	@Override
+	public String getID() {
+		return "GNOMEKeyring";
+	}
 	
     @Override
     public void setup() throws BackendNotSupportedException {
@@ -28,115 +36,87 @@ public class GNOMEKeyringBackend extends KeyringBackend {
 			throw new BackendNotSupportedException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));
     }
 
-    /**
-     * Returns true when the backend is supported
-     */
     @Override
     public boolean isSupported() {
         return Platform.isLinux();
     }
 
-    /**
-     * Returns true if the backend directory uses some file to store passwords
-     */
     @Override
     public boolean isKeyStorePathRequired() {
         return true;
     }
 
-    /**
-     * Gets password from key store
-     *
-     * @param service   Service name
-     * @param account   Account name
-     *
-     * @return  Password related to specified service and account
-     *
-     * @throws PasswordRetrievalException   Thrown when an error happened while getting password
-     */
     @Override
     public String getPassword(String service, String account) throws PasswordRetrievalException {
-		PointerByReference item_info = new PointerByReference();
-//		Pointer item = null;
+		ServiceAndAccount.validate(service, account);
 
-		Map<String, Integer> map;
-
+		Map<ServiceAndAccount, Integer> map;
 		try {
-			map = loadMap();
+			map = loadEntries();
 		} catch (Exception e) {
-			throw new PasswordRetrievalException("Failed to load map from keystore", e);
+			throw new PasswordRetrievalException("Failed to load entries from the keystore", e);
 		}
 
-		Integer id = map.get(service + "/" + account);
+		Integer id = map.get(new ServiceAndAccount(service, account));
 		if (id == null)
-			throw new PasswordRetrievalException("No password stored for this service and account.");
+			return null;
 
-//		try {
+		PointerByReference item_info = new PointerByReference();
+		try {
 			int result = NativeLibraryManager.gklib.gnome_keyring_item_get_info_full_sync(null, id, 1, item_info);
 			if (result == 0)
 				return NativeLibraryManager.gklib.gnome_keyring_item_info_get_secret(item_info.getValue());
 
 			throw new PasswordRetrievalException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));
-/*		} finally {
-			if (item != null)
-				NativeLibraryManager.gklib.gnome_keyring_item_info_free(item);
-		} */
+		} finally {
+			NativeLibraryManager.gklib.gnome_keyring_item_info_free(item_info.getValue());
+		}
     }
 
-    /**
-     * Sets password to key store
-     *
-     * @param service   Service name
-     * @param account   Account name
-     * @param password  Password
-     *
-     * @throws PasswordSaveException    Thrown when an error happened while saving the password
-     */
     @Override
     public void setPassword(String service, String account, String password) throws PasswordSaveException {
+		ServiceAndAccount.validate(service, account);
+
+		Map<ServiceAndAccount, Integer> map;
+		try {
+			map = loadEntries();
+		} catch (Exception e) {
+			throw new PasswordSaveException("Failed to load entries from the keystore", e);
+		}
+
     	IntByReference item_id = new IntByReference();
     	int result = NativeLibraryManager.gklib.gnome_keyring_set_network_password_sync(null, account, null, service, null, null, null, 0, password, item_id);
 		if (result != 0)
 			throw new PasswordSaveException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));
 
-		Map<String, Integer> map;
-		try {
-			map = loadMap();
-		} catch (Exception e) {
-			throw new PasswordSaveException("Failed to load password entries from the keystore", e);
-		}
-
-		map.put(service + "/" + account, item_id.getValue());
+		map.put(new ServiceAndAccount(service, account), item_id.getValue());
 
 		try {
-			saveMap(map);
+			saveEntries(map);
 		} catch (Exception e) {
-			throw new PasswordSaveException("Failed to save password entries to the keystore", e);
+			throw new PasswordSaveException("Failed to save entries to the keystore", e);
 		}
     }
 
-    /**
-     * Gets backend ID
-     */
-    @Override
-    public String getID() {
-        return "GNOMEKeyring";
-    }
-
-    @SuppressWarnings("unchecked")
-	private Map<String, Integer> loadMap() throws Exception {
-		if (Files.exists(this.keyStorePath) && Files.size(this.keyStorePath) > 0) {
-			try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(this.keyStorePath))) {
-				return (Map<String, Integer>) in.readObject();
+	private Map<ServiceAndAccount, Integer> loadEntries() throws IOException {
+		Map<ServiceAndAccount, Integer> map = new HashMap<>();
+    	if (Files.exists(this.keyStorePath) && Files.size(this.keyStorePath) != 0) {
+			try (DataInputStream in = new DataInputStream(Files.newInputStream(this.keyStorePath))) {
+				int count = in.readInt();
+				for (int i = 0; i < count; i++)
+					map.put(ServiceAndAccount.read(in), in.readInt());
 			}
 		}
-		return new HashMap<>();
+		return map;
     }
 
-    private void saveMap(Map<String, Integer> map) throws Exception {
-    	try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(this.keyStorePath))) {
-			out.writeObject(map);
-			out.flush();
+    private void saveEntries(Map<ServiceAndAccount, Integer> map) throws IOException {
+    	try (DataOutputStream out = new DataOutputStream(Files.newOutputStream(this.keyStorePath))) {
+    		out.writeInt(map.size());
+    		for (Entry<ServiceAndAccount, Integer> e : map.entrySet()) {
+				e.getKey().write(out);
+				out.writeInt(e.getValue());
+			}
 		}
     }
 }

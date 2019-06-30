@@ -1,7 +1,5 @@
 package net.east301.keyring;
 
-import net.east301.keyring.util.LockException;
-
 import java.nio.file.Path;
 
 /**
@@ -83,7 +81,7 @@ public class Keyring {
      *
      * @throws PasswordRetrievalException   Thrown when an error happened while getting password
      */
-    public String getPassword(String service, String account) throws LockException, PasswordRetrievalException {
+    public String getPassword(String service, String account) throws PasswordRetrievalException {
         return this.backend.getPassword(service, account);
     }
 
@@ -97,7 +95,7 @@ public class Keyring {
      *
      * @throws PasswordSaveException    Thrown when an error happened while saving the password
      */
-    public void setPassword(String service, String account, String password) throws LockException, PasswordSaveException {
+    public void setPassword(String service, String account, String password) throws PasswordSaveException {
         this.backend.setPassword(service, account, password);
     }
 

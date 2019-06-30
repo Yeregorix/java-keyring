@@ -1,7 +1,5 @@
 package net.east301.keyring;
 
-import net.east301.keyring.util.LockException;
-
 import java.nio.file.Path;
 
 public abstract class KeyringBackend {
@@ -49,8 +47,7 @@ public abstract class KeyringBackend {
      *
      * @throws PasswordRetrievalException   Thrown when an error happened while getting password
      */
-    public abstract String getPassword(String service, String account)
-            throws LockException, PasswordRetrievalException;
+    public abstract String getPassword(String service, String account) throws PasswordRetrievalException;
 
     /**
      * Sets password to key store
@@ -61,8 +58,7 @@ public abstract class KeyringBackend {
      *
      * @throws PasswordSaveException    Thrown when an error happened while saving the password
      */
-    public abstract void setPassword(String service, String account, String password)
-            throws LockException, PasswordSaveException;
+    public abstract void setPassword(String service, String account, String password) throws PasswordSaveException;
 
     /**
      * Gets backend ID

@@ -10,7 +10,7 @@ public class PasswordSaveException extends Exception {
     }
 
     public PasswordSaveException(String message, Throwable cause) {
-        super(message);
+        super(message, cause);
     }
 
 }

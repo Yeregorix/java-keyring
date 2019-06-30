@@ -97,9 +97,6 @@ public class OSXKeychainBackendTest {
     }
 
     private static final String SERVICE = "net.east301.keyring.osx unit test";
-
     private static final String ACCOUNT = "tester";
-
     private static final String PASSWORD = "HogeHoge2012";
-
 }

@@ -4,7 +4,6 @@ import net.east301.keyring.BackendNotSupportedException;
 import net.east301.keyring.Keyring;
 import net.east301.keyring.PasswordRetrievalException;
 import net.east301.keyring.PasswordSaveException;
-import net.east301.keyring.util.LockException;
 
 import java.io.File;
 import java.io.IOException;
