@@ -1,17 +1,11 @@
-/**
- * @author  $Author$
- * @date    $Date$
- * @version $Revision$
- */
-
 package net.east301.keyring;
-
-import java.util.ArrayList;
 
 import net.east301.keyring.gnome.GNOMEKeyringBackend;
 import net.east301.keyring.memory.UncryptedMemoryBackend;
 import net.east301.keyring.osx.OSXKeychainBackend;
 import net.east301.keyring.windows.WindowsDPAPIBackend;
+
+import java.util.ArrayList;
 
 /**
  * Factory of KeyringBackend
@@ -22,10 +16,9 @@ class KeyringBackendFactory {
      * Creates an instance of KeyringBackend
      */
     public static KeyringBackend create() throws BackendNotSupportedException {
-
         for (Object[] entry : KeyringBackendFactory.KEYRING_BACKENDS) {
-            String name = (String)entry[0];
-            Class cls = (Class)entry[1];
+            String name = (String) entry[0];
+            Class cls = (Class) entry[1];
 
             KeyringBackend backend = tryToCreateBackend(cls);
             if (backend != null) { return backend; }
@@ -40,7 +33,6 @@ class KeyringBackendFactory {
      * @param preferred Preferred backend name
      */
     public static KeyringBackend create(String preferred) throws BackendNotSupportedException {
-        //
         Class backendClass = null;
 
         for (Object[] entry : KeyringBackendFactory.KEYRING_BACKENDS) {
@@ -53,19 +45,13 @@ class KeyringBackendFactory {
             }
         }
 
-        if (backendClass == null) {
-            throw new BackendNotSupportedException(
-                    String.format("The backend '%s' is not registered", preferred));
-        }
+        if (backendClass == null)
+            throw new BackendNotSupportedException(String.format("The backend '%s' is not registered", preferred));
 
-        //
         KeyringBackend backend = tryToCreateBackend(backendClass);
-        if (backend == null) {
-            throw new BackendNotSupportedException(
-                    String.format("The backend '%s' is not supported", preferred));
-        }
+        if (backend == null)
+            throw new BackendNotSupportedException(String.format("The backend '%s' is not supported", preferred));
 
-        //
         return backend;
     }
 
@@ -73,7 +59,7 @@ class KeyringBackendFactory {
      * Returns names of registered keyring backends
      */
     public static String[] getAllBackendNames() {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         for (Object[] entry : KeyringBackendFactory.KEYRING_BACKENDS) {
             result.add((String)entry[0]);
         }
@@ -87,7 +73,6 @@ class KeyringBackendFactory {
      * @param backendClass  Target backend class
      */
     private static KeyringBackend tryToCreateBackend(Class backendClass) {
-        //
         KeyringBackend backend;
         try {
             backend = (KeyringBackend)backendClass.newInstance();
@@ -96,10 +81,9 @@ class KeyringBackendFactory {
             return null;
         }
 
-        //
-        if (!backend.isSupported()) { return null; }
+        if (!backend.isSupported())
+            return null;
 
-        //
         try {
             backend.setup();
         } catch (BackendNotSupportedException ex) {
@@ -120,4 +104,4 @@ class KeyringBackendFactory {
         { "UncryptedMemory",    UncryptedMemoryBackend.class }
     };
 
-} // class KeyringBackendFactory
+}

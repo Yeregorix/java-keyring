@@ -1,30 +1,18 @@
-/**
- * @author  $Author$
- * @date    $Date$
- * @version $Revision$
- */
-
 package net.east301.keyring.gnome;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.sun.jna.Platform;
-import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
-
 import net.east301.keyring.BackendNotSupportedException;
 import net.east301.keyring.KeyringBackend;
 import net.east301.keyring.PasswordRetrievalException;
 import net.east301.keyring.PasswordSaveException;
+
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Keyring backend which uses GNOME Keyring
@@ -34,12 +22,10 @@ public class GNOMEKeyringBackend extends KeyringBackend {
     @Override
     public void setup() throws BackendNotSupportedException {
         NativeLibraryManager.loadNativeLibraries();
-        
-        // unlock default keyring
+
 		int result = NativeLibraryManager.gklib.gnome_keyring_unlock_sync(null, null);
-		if (result != 0) {
+		if (result != 0)
 			throw new BackendNotSupportedException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));
-		}
     }
 
     /**
@@ -69,26 +55,32 @@ public class GNOMEKeyringBackend extends KeyringBackend {
      * @throws PasswordRetrievalException   Thrown when an error happened while getting password
      */
     @Override
-    public String getPassword(String service, String account)
-            throws PasswordRetrievalException {
+    public String getPassword(String service, String account) throws PasswordRetrievalException {
+		PointerByReference item_info = new PointerByReference();
+//		Pointer item = null;
 
-		PointerByReference ptr = new PointerByReference();
-		Pointer item = null;
-		Map<String, Integer> map = loadMap();
-		Integer id = map.get(service + "/" + account);
-		if(id == null)
-			throw new PasswordRetrievalException("No password stored for this service and account.");
+		Map<String, Integer> map;
+
 		try {
-			int result = NativeLibraryManager.gklib.gnome_keyring_item_get_info_full_sync(null, id, 1, ptr);
-			if (result == 0) {
-				return NativeLibraryManager.gklib.gnome_keyring_item_info_get_secret(ptr.getValue());
-			} else {
-				throw new PasswordRetrievalException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));
-			}
-		} finally {
+			map = loadMap();
+		} catch (Exception e) {
+			throw new PasswordRetrievalException("Failed to load map from keystore", e);
+		}
+
+		Integer id = map.get(service + "/" + account);
+		if (id == null)
+			throw new PasswordRetrievalException("No password stored for this service and account.");
+
+//		try {
+			int result = NativeLibraryManager.gklib.gnome_keyring_item_get_info_full_sync(null, id, 1, item_info);
+			if (result == 0)
+				return NativeLibraryManager.gklib.gnome_keyring_item_info_get_secret(item_info.getValue());
+
+			throw new PasswordRetrievalException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));
+/*		} finally {
 			if (item != null)
 				NativeLibraryManager.gklib.gnome_keyring_item_info_free(item);
-		}
+		} */
     }
 
     /**
@@ -101,18 +93,26 @@ public class GNOMEKeyringBackend extends KeyringBackend {
      * @throws PasswordSaveException    Thrown when an error happened while saving the password
      */
     @Override
-    public void setPassword(String service, String account, String password)
-            throws PasswordSaveException {
-    	IntByReference ref = new IntByReference();
-    	int result = NativeLibraryManager.gklib.gnome_keyring_set_network_password_sync(null, account, 
-    			null, service, null, null, null, 0,
-    			password, ref);
-		if (result != 0) {
+    public void setPassword(String service, String account, String password) throws PasswordSaveException {
+    	IntByReference item_id = new IntByReference();
+    	int result = NativeLibraryManager.gklib.gnome_keyring_set_network_password_sync(null, account, null, service, null, null, null, 0, password, item_id);
+		if (result != 0)
 			throw new PasswordSaveException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));
+
+		Map<String, Integer> map;
+		try {
+			map = loadMap();
+		} catch (Exception e) {
+			throw new PasswordSaveException("Failed to load password entries from the keystore", e);
 		}
-		Map<String, Integer> map = loadMap();
-		map.put(service + "/" + account, ref.getValue());
-		saveMap(map);
+
+		map.put(service + "/" + account, item_id.getValue());
+
+		try {
+			saveMap(map);
+		} catch (Exception e) {
+			throw new PasswordSaveException("Failed to save password entries to the keystore", e);
+		}
     }
 
     /**
@@ -123,51 +123,20 @@ public class GNOMEKeyringBackend extends KeyringBackend {
         return "GNOMEKeyring";
     }
 
-    /**
-     * Loads map from a file.
-     * This method is not thread/process safe.
-     */
     @SuppressWarnings("unchecked")
-	private Map<String, Integer> loadMap() {
-		try {
-			File f = new File(m_keyStorePath);
-			if (f.exists() && f.length() > 0) {
-				ObjectInputStream fin = new ObjectInputStream(new FileInputStream(f));
-				try {
-					return (Map<String, Integer>) fin.readObject();
-				} finally {
-					fin.close();
-				}
+	private Map<String, Integer> loadMap() throws Exception {
+		if (Files.exists(this.keyStorePath) && Files.size(this.keyStorePath) > 0) {
+			try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(this.keyStorePath))) {
+				return (Map<String, Integer>) in.readObject();
 			}
-		} catch (Exception ex) {
-			Logger.getLogger(GNOMEKeyringBackend.class.getName()).log(Level.SEVERE, null, ex);
 		}
-		return new HashMap<String, Integer>();
+		return new HashMap<>();
     }
 
-    /**
-     * Saves account/save to ID map to a file
-     * This method is not thread/process safe.
-     *
-     * @param entries   Map to be saved
-     *
-     * @throws PasswordSaveException    Thrown when an error happened while writing to a file
-     */
-    private void saveMap(Map<String, Integer> map)
-            throws PasswordSaveException {
-
-        try {
-        	ObjectOutputStream fout = new ObjectOutputStream(new FileOutputStream(m_keyStorePath));
-            try {
-	            fout.writeObject(map);
-	            fout.flush();
-            }
-            finally {
-            	fout.close();
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(GNOMEKeyringBackend.class.getName()).log(Level.SEVERE, null, ex);
-            throw new PasswordSaveException("Failed to save password entries to a file");
-        }
+    private void saveMap(Map<String, Integer> map) throws Exception {
+    	try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(this.keyStorePath))) {
+			out.writeObject(map);
+			out.flush();
+		}
     }
-} // class GNOMEKeyringBackend
+}

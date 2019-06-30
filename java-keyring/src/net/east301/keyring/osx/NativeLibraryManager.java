@@ -1,9 +1,3 @@
-/**
- * @author  $Author$
- * @date    $Date$
- * @version $Revision$
- */
-
 package net.east301.keyring.osx;
 
 import com.sun.jna.Native;
@@ -15,15 +9,14 @@ import net.east301.keyring.BackendNotSupportedException;
 class NativeLibraryManager {
 
     public static synchronized void loadNativeLibraries() throws BackendNotSupportedException {
-        if (CoreFoundation != null && Security != null) { return; }
+        if (CoreFoundation != null && Security != null)
+            return;
 
         try {
-            CoreFoundation = (CoreFoundationLibrary)Native.loadLibrary(
-                    "CoreFoundation", CoreFoundationLibrary.class);
-            Security = (SecurityLibrary)Native.loadLibrary(
-                    "Security", SecurityLibrary.class);
-        } catch (UnsatisfiedLinkError ex) {
-            throw new BackendNotSupportedException("Failed to load native library");
+            CoreFoundation = (CoreFoundationLibrary) Native.loadLibrary("CoreFoundation", CoreFoundationLibrary.class);
+            Security = (SecurityLibrary) Native.loadLibrary("Security", SecurityLibrary.class);
+        } catch (UnsatisfiedLinkError e) {
+            throw new BackendNotSupportedException("Failed to load native library", e);
         }
     }
 
@@ -37,4 +30,4 @@ class NativeLibraryManager {
      */
     public static SecurityLibrary Security = null;
 
-} // class NativeLibraryManager
+}

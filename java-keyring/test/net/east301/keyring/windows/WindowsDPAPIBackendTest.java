@@ -5,11 +5,15 @@
 package net.east301.keyring.windows;
 
 import com.sun.jna.Platform;
-import java.io.File;
 import net.east301.keyring.PasswordRetrievalException;
-import static org.junit.Assert.*;
-import static org.junit.Assume.*;
 import org.junit.Test;
+
+import java.io.File;
+import java.nio.file.Paths;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * Test of WindowsDPAPIBackend class
@@ -21,10 +25,7 @@ public class WindowsDPAPIBackendTest {
      */
     @Test
     public void testIsSupported() {
-        //
         assumeTrue(Platform.isWindows());
-
-        //
         assertTrue(new WindowsDPAPIBackend().isSupported());
     }
 
@@ -33,10 +34,7 @@ public class WindowsDPAPIBackendTest {
      */
     @Test
     public void testIsKeyStorePathRequired() {
-        //
         assumeTrue(Platform.isWindows());
-
-        //
         assertTrue(new WindowsDPAPIBackend().isKeyStorePathRequired());
     }
 
@@ -46,18 +44,14 @@ public class WindowsDPAPIBackendTest {
      */
     @Test(expected = PasswordRetrievalException.class)
     public void testGetPassword_InvalidEntry() throws Exception {
-        //
         assumeTrue(Platform.isWindows());
 
-        //
         File keystore = File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX);
 
-        //
         WindowsDPAPIBackend backend = new WindowsDPAPIBackend();
-        backend.setKeyStorePath(keystore.getPath());
+        backend.setKeyStorePath(keystore.toPath());
         backend.setup();
 
-        //
         backend.getPassword(SERVICE, ACCOUNT);
     }
 
@@ -66,18 +60,14 @@ public class WindowsDPAPIBackendTest {
      * by specifying valid entry.
      */
     public void testGetPassword_ValidEntry() throws Exception {
-        //
         assumeTrue(Platform.isWindows());
 
-        //
         File keystore = File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX);
 
-        //
         WindowsDPAPIBackend backend = new WindowsDPAPIBackend();
-        backend.setKeyStorePath(keystore.getPath());
+        backend.setKeyStorePath(keystore.toPath());
         backend.setup();
 
-        //
         backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
         assertEquals(PASSWORD, backend.getPassword(SERVICE, ACCOUNT));
     }
@@ -87,18 +77,14 @@ public class WindowsDPAPIBackendTest {
      */
     @Test
     public void testSetPassword() throws Exception {
-        //
         assumeTrue(Platform.isWindows());
 
-        //
         File keystore = File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX);
 
-        //
         WindowsDPAPIBackend backend = new WindowsDPAPIBackend();
-        backend.setKeyStorePath(keystore.getPath());
+        backend.setKeyStorePath(keystore.toPath());
         backend.setup();
 
-        //
         backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
         assertEquals(PASSWORD, backend.getPassword(SERVICE, ACCOUNT));
     }
@@ -108,10 +94,8 @@ public class WindowsDPAPIBackendTest {
      */
     @Test
     public void testGetID() {
-        //
         assumeTrue(Platform.isWindows());
 
-        //
         assertEquals("WindowsDPAPI", new WindowsDPAPIBackend().getID());
     }
 
@@ -120,41 +104,23 @@ public class WindowsDPAPIBackendTest {
      */
     @Test
     public void testGetLockPath() throws Exception {
-        //
         assumeTrue(Platform.isWindows());
 
-        //
         WindowsDPAPIBackend backend = new WindowsDPAPIBackend();
-        backend.setKeyStorePath("/path/to/keystore");
+        backend.setKeyStorePath(Paths.get("/path/to/keystore"));
         backend.setup();
 
-        //
-        assertEquals("/path/to/keystore.lock", backend.getLockPath());
+        assertEquals(Paths.get("/path/to/keystore.lock"), backend.getLockPath());
     }
 
-    /**
-     *
-     */
     private static final String SERVICE = "net.east301.keyring.windows unit test";
 
-    /**
-     *
-     */
     private static final String ACCOUNT = "tester";
 
-    /**
-     *
-     */
     private static final String PASSWORD = "HogeHoge2012";
 
-    /**
-     *
-     */
     private static final String KEYSTORE_PREFIX = "keystore";
 
-    /**
-     *
-     */
     private static final String KEYSTORE_SUFFIX = ".keystore";
 
-} // class WindowsDPAPIBackendTest
+}

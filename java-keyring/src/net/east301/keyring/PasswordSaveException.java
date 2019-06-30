@@ -1,9 +1,3 @@
-/**
- * @author  $Author$
- * @date    $Date$
- * @version $Revision$
- */
-
 package net.east301.keyring;
 
 /**
@@ -11,13 +5,12 @@ package net.east301.keyring;
  */
 public class PasswordSaveException extends Exception {
 
-    /**
-     * Initializes an instance of PasswordSaveException
-     *
-     * @param message   Error message
-     */
     public PasswordSaveException(String message) {
         super(message);
     }
 
-} // class PasswordSaveException
+    public PasswordSaveException(String message, Throwable cause) {
+        super(message);
+    }
+
+}

@@ -1,14 +1,11 @@
-/**
- * @author  $Author$
- * @date    $Date$
- * @version $Revision$
- */
-
 package net.east301.keyring;
 
-import net.east301.keyring.util.LockException;
-import static org.junit.Assert.*;
 import org.junit.Test;
+
+import java.nio.file.Paths;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Test of KeyringBackend class
@@ -20,15 +17,12 @@ public class KeyringBackendTest {
      */
     @Test
     public void testGetKeyStorePath() {
-        //
         KeyringBackend instance = new KeyringBackendImpl();
 
-        //
         assertNull(instance.getKeyStorePath());
 
-        //
-        instance.setKeyStorePath("/path/to/keystore");
-        assertEquals("/path/to/keystore", instance.getKeyStorePath());
+        instance.setKeyStorePath(Paths.get("/path/to/keystore"));
+        assertEquals(Paths.get("/path/to/keystore"), instance.getKeyStorePath());
     }
 
     /**
@@ -36,12 +30,10 @@ public class KeyringBackendTest {
      */
     @Test
     public void testSetKeyStorePath() {
-        //
         KeyringBackend instance = new KeyringBackendImpl();
 
-        //
-        instance.setKeyStorePath("/path/to/keystore");
-        assertEquals("/path/to/keystore", instance.getKeyStorePath());
+        instance.setKeyStorePath(Paths.get("/path/to/keystore"));
+        assertEquals(Paths.get("/path/to/keystore"), instance.getKeyStorePath());
     }
 
     public class KeyringBackendImpl extends KeyringBackend {
@@ -57,14 +49,12 @@ public class KeyringBackendTest {
         }
 
         @Override
-        public String getPassword(String service, String account)
-                throws LockException, PasswordRetrievalException {
+        public String getPassword(String service, String account) {
             return "";
         }
 
         @Override
-        public void setPassword(String service, String account, String password)
-                throws LockException, PasswordSaveException {
+        public void setPassword(String service, String account, String password) {
         }
 
         @Override
@@ -73,4 +63,4 @@ public class KeyringBackendTest {
         }
     }
 
-} // class KeyringBackendTest
+}

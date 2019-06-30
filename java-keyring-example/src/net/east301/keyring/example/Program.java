@@ -1,20 +1,15 @@
-/**
- * @author  $Author$
- * @date    $Date$
- * @version $Revision$
- */
-
 package net.east301.keyring.example;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.east301.keyring.BackendNotSupportedException;
 import net.east301.keyring.Keyring;
 import net.east301.keyring.PasswordRetrievalException;
 import net.east301.keyring.PasswordSaveException;
 import net.east301.keyring.util.LockException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Usage example of java-keyring library
@@ -50,7 +45,7 @@ public class Program {
         if (keyring.isKeyStorePathRequired()) {
             try {
                 File keyStoreFile = File.createTempFile("keystore", ".keystore");
-                keyring.setKeyStorePath(keyStoreFile.getPath());
+                keyring.setKeyStorePath(keyStoreFile.toPath());
             } catch (IOException ex) {
                 Logger.getLogger(Program.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -65,10 +60,7 @@ public class Program {
         // LockException is thrown when keyring backend failed to lock key store file.
         try {
             keyring.setPassword("My service name", "My account name", "My password");
-        } catch (LockException ex) {
-            Logger.getLogger(Program.class.getName()).log(Level.SEVERE, null, ex);
-            return;
-        } catch (PasswordSaveException ex) {
+        } catch (LockException | PasswordSaveException ex) {
             Logger.getLogger(Program.class.getName()).log(Level.SEVERE, null, ex);
             return;
         }
@@ -83,10 +75,8 @@ public class Program {
         try {
             String password = keyring.getPassword("My service name", "My account name");
             System.out.println(password);
-        } catch (LockException ex) {
-            Logger.getLogger(Program.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (PasswordRetrievalException ex) {
+        } catch (LockException | PasswordRetrievalException ex) {
             Logger.getLogger(Program.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-} // class Program
+}

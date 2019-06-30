@@ -1,20 +1,16 @@
-/**
- * @author  $Author$
- * @date    $Date$
- * @version $Revision$
- */
-
 package net.east301.keyring;
 
 import com.sun.jna.Platform;
-import java.io.File;
-
 import net.east301.keyring.gnome.GNOMEKeyringBackend;
 import net.east301.keyring.memory.UncryptedMemoryBackend;
 import net.east301.keyring.osx.OSXKeychainBackend;
 import net.east301.keyring.windows.WindowsDPAPIBackend;
-import static org.junit.Assert.*;
 import org.junit.Test;
+
+import java.io.File;
+import java.nio.file.Paths;
+
+import static org.junit.Assert.*;
 
 /**
  * Test of Keyring class
@@ -30,7 +26,7 @@ public class KeyringTest {
 
         assertNotNull(keyring);
         assertNotNull(keyring.getBackend());
-        assertTrue(keyring.getBackend() instanceof KeyringBackend);
+    //    assertTrue(keyring.getBackend() instanceof KeyringBackend);
     }
 
     /**
@@ -38,10 +34,8 @@ public class KeyringTest {
      */
     @Test
     public void testCreate_String() throws Exception {
-        //
         Keyring keyring;
 
-        //
         if (Platform.isMac()) {
             keyring = Keyring.create("OSXKeychain");
 
@@ -56,14 +50,13 @@ public class KeyringTest {
             assertTrue(keyring.getBackend() instanceof WindowsDPAPIBackend);
         }
 
-        //
-        if (true) {
+//        if (true) {
             keyring = Keyring.create("UncryptedMemory");
 
             assertNotNull(keyring);
             assertNotNull(keyring.getBackend());
             assertTrue(keyring.getBackend() instanceof UncryptedMemoryBackend);
-        }
+//        }
     }
 
     /**
@@ -91,15 +84,12 @@ public class KeyringTest {
      */
     @Test
     public void testGetKeyStorePath() throws Exception {
-        //
         Keyring keyring = Keyring.create();
 
-        //
         assertNull(keyring.getKeyStorePath());
 
-        //
-        keyring.setKeyStorePath("/path/to/keystore");
-        assertEquals("/path/to/keystore", keyring.getKeyStorePath());
+        keyring.setKeyStorePath(Paths.get("/path/to/keystore"));
+        assertEquals(Paths.get("/path/to/keystore"), keyring.getKeyStorePath());
     }
 
     /**
@@ -107,12 +97,10 @@ public class KeyringTest {
      */
     @Test
     public void testSetKeyStorePath() throws Exception {
-        //
         Keyring keyring = Keyring.create();
 
-        //
-        keyring.setKeyStorePath("/path/to/keystore");
-        assertEquals("/path/to/keystore", keyring.getKeyStorePath());
+        keyring.setKeyStorePath(Paths.get("/path/to/keystore"));
+        assertEquals(Paths.get("/path/to/keystore"), keyring.getKeyStorePath());
     }
 
     /**
@@ -120,13 +108,9 @@ public class KeyringTest {
      */
     @Test
     public void testIsKeyStorePathRequired() throws Exception {
-        //
         Keyring keyring = Keyring.create();
 
-        //
-        assertEquals(
-                keyring.isKeyStorePathRequired(),
-                keyring.getBackend().isKeyStorePathRequired());
+        assertEquals(keyring.isKeyStorePathRequired(), keyring.getBackend().isKeyStorePathRequired());
     }
 
     /**
@@ -134,18 +118,15 @@ public class KeyringTest {
      */
     @Test
     public void testGetPassword() throws Exception {
-        //
         Keyring keyring = Keyring.create();
 
         if (keyring.isKeyStorePathRequired()) {
-            keyring.setKeyStorePath(
-                    File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX).getPath());
+            File f = File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX);
+            keyring.setKeyStorePath(f.toPath());
         }
 
-        //
-        checkExistanceOfPasswordEntry(keyring);
+        checkExistenceOfPasswordEntry(keyring);
 
-        //
         keyring.setPassword(SERVICE, ACCOUNT, PASSWORD);
         assertEquals(PASSWORD, keyring.getPassword(SERVICE, ACCOUNT));
     }
@@ -155,58 +136,35 @@ public class KeyringTest {
      */
     @Test
     public void testSetPassword() throws Exception {
-        //
         Keyring keyring = Keyring.create();
 
         if (keyring.isKeyStorePathRequired()) {
-            keyring.setKeyStorePath(
-                    File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX).getPath());
+            File f = File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX);
+            keyring.setKeyStorePath(f.toPath());
         }
 
-        //
         keyring.setPassword(SERVICE, ACCOUNT, PASSWORD);
         assertEquals(PASSWORD, keyring.getPassword(SERVICE, ACCOUNT));
     }
 
-    /**
-     *
-     * @param backend
-     */
-    private void checkExistanceOfPasswordEntry(Keyring keyring) {
+    private void checkExistenceOfPasswordEntry(Keyring keyring) {
         try {
             keyring.getPassword(SERVICE, ACCOUNT);
 
-            System.err.println(String.format(
-                    "Please remove password entry '%s' before running the tests",
-                    SERVICE));
+            System.err.println(String.format("Please remove password entry '%s' before running the tests", SERVICE));
         } catch (Exception ex) {
             // do nothing
         }
     }
 
-    /**
-     *
-     */
     private static final String SERVICE = "net.east301.keyring unit test";
 
-    /**
-     *
-     */
     private static final String ACCOUNT = "tester";
 
-    /**
-     *
-     */
     private static final String PASSWORD = "HogeHoge2012";
 
-    /**
-     *
-     */
     private static final String KEYSTORE_PREFIX = "keystore";
 
-    /**
-     *
-     */
     private static final String KEYSTORE_SUFFIX = ".keystore";
 
-} // class KeyringTest
+}

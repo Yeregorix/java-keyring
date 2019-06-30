@@ -1,30 +1,23 @@
-/**
- * @author  $Author$
- * @date    $Date$
- * @version $Revision$
- */
-
 package net.east301.keyring;
 
 import net.east301.keyring.util.LockException;
 
-/**
- * java-keyring backend interface
- */
+import java.nio.file.Path;
+
 public abstract class KeyringBackend {
+
+    protected Path keyStorePath;
 
     /**
      * Setup actual key store
      */
-    public void setup() throws BackendNotSupportedException {
-        // to be overrode
-    }
+    public void setup() throws BackendNotSupportedException {}
 
     /**
      * Gets path to key store
      */
-    public String getKeyStorePath() {
-        return m_keyStorePath;
+    public Path getKeyStorePath() {
+        return this.keyStorePath;
     }
 
     /**
@@ -32,8 +25,8 @@ public abstract class KeyringBackend {
      *
      * @param path  Path to key store
      */
-    public void setKeyStorePath(String path) {
-        m_keyStorePath = path;
+    public void setKeyStorePath(Path path) {
+        this.keyStorePath = path;
     }
 
     /**
@@ -76,9 +69,4 @@ public abstract class KeyringBackend {
      */
     public abstract String getID();
 
-    /**
-     * Path to key store
-     */
-    protected String m_keyStorePath;
-
-} // class KeyringBackend
+}

@@ -1,9 +1,3 @@
-/**
- * @author  $Author$
- * @date    $Date$
- * @version $Revision$
- */
-
 package net.east301.keyring.util;
 
 /**
@@ -11,13 +5,11 @@ package net.east301.keyring.util;
  */
 public class LockException extends Exception {
 
-    /**
-     * Initializes an instance of LockException
-     *
-     * @param message   Error message
-     */
-    public LockException(String message, Throwable innerException) {
-        super(message, innerException);
+    public LockException(String message) {
+        super(message);
     }
 
-} // class LockException
+    public LockException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}

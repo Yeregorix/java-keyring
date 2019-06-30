@@ -1,18 +1,13 @@
-/**
- * @author  $Author$
- * @date    $Date$
- * @version $Revision$
- */
-
 package net.east301.keyring.osx;
 
 import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
-import java.io.UnsupportedEncodingException;
 import net.east301.keyring.BackendNotSupportedException;
 import net.east301.keyring.KeyringBackend;
 import net.east301.keyring.PasswordRetrievalException;
 import net.east301.keyring.PasswordSaveException;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * Keyring backend which uses OS X Keychain
@@ -51,44 +46,23 @@ public class OSXKeychainBackend extends KeyringBackend {
      * @throws PasswordRetrievalException   Thrown when an error happened while getting password
      */
     @Override
-    public String getPassword(String service, String account)
-            throws PasswordRetrievalException {
+    public String getPassword(String service, String account) throws PasswordRetrievalException {
+        byte[] serviceBytes = service.getBytes(StandardCharsets.UTF_8), accountBytes = account.getBytes(StandardCharsets.UTF_8);
 
-        //
-        byte[] serviceBytes, accountBytes;
-
-        try {
-            serviceBytes = service.getBytes("UTF-8");
-            accountBytes = account.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new PasswordRetrievalException("Unsupported encoding 'UTF-8' specified");
-        }
-
-        //
         int[] dataLength = new int[1];
         Pointer[] data = new Pointer[1];
 
-        //
         int status = NativeLibraryManager.Security.SecKeychainFindGenericPassword(
                 null, serviceBytes.length, serviceBytes,
                 accountBytes.length, accountBytes,
                 dataLength, data, null);
-        if (status != 0) {
+
+        if (status != 0)
             throw new PasswordRetrievalException(convertErrorCodeToMessage(status));
-        }
 
-        //
         byte[] passwordBytes = data[0].getByteArray(0, dataLength[0]);
-
-        //
         NativeLibraryManager.Security.SecKeychainItemFreeContent(null, data[0]);
-
-        //
-        try {
-            return new String(passwordBytes, "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new PasswordRetrievalException("Unsupported encoding 'UTF-8' specified");
-        }
+        return new String(passwordBytes, StandardCharsets.UTF_8);
     }
 
     /**
@@ -101,35 +75,19 @@ public class OSXKeychainBackend extends KeyringBackend {
      * @throws PasswordSaveException    Thrown when an error happened while saving the password
      */
     @Override
-    public void setPassword(String service, String account, String password)
-            throws PasswordSaveException {
+    public void setPassword(String service, String account, String password) throws PasswordSaveException {
+        byte[] serviceBytes = service.getBytes(StandardCharsets.UTF_8), accountBytes = account.getBytes(StandardCharsets.UTF_8), passwordBytes = password.getBytes(StandardCharsets.UTF_8);
 
-        //
-        byte[] serviceBytes, accountBytes, passwordBytes;
-
-        try {
-            serviceBytes = service.getBytes("UTF-8");
-            accountBytes = account.getBytes("UTF-8");
-            passwordBytes = password.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new PasswordSaveException("Unsupported encoding 'UTF-8' specified");
-        }
-
-        //
         Pointer[] itemRef = new Pointer[1];
 
-        //
         int status = NativeLibraryManager.Security.SecKeychainFindGenericPassword(
                     null, serviceBytes.length, serviceBytes,
                     accountBytes.length, accountBytes,
                     null, null, itemRef);
 
-        if (status != SecurityLibrary.ERR_SEC_SUCCESS
-                && status != SecurityLibrary.ERR_SEC_ITEM_NOT_FOUND) {
+        if (status != SecurityLibrary.ERR_SEC_SUCCESS && status != SecurityLibrary.ERR_SEC_ITEM_NOT_FOUND)
             throw new PasswordSaveException(convertErrorCodeToMessage(status));
-        }
 
-        //
         if (itemRef[0] != null) {
             status = NativeLibraryManager.Security.SecKeychainItemModifyContent(
                     itemRef[0], null, passwordBytes.length, passwordBytes);
@@ -142,9 +100,8 @@ public class OSXKeychainBackend extends KeyringBackend {
                     passwordBytes.length, passwordBytes, null);
         }
 
-        if (status != 0) {
+        if (status != 0)
             throw new PasswordSaveException(convertErrorCodeToMessage(status));
-        }
     }
 
     /**
@@ -161,23 +118,18 @@ public class OSXKeychainBackend extends KeyringBackend {
      * @param errorCode OSStat to be converted
      */
     private String convertErrorCodeToMessage(int errorCode) {
-        //
         Pointer msgPtr = NativeLibraryManager.Security.SecCopyErrorMessageString(errorCode, null);
-        if (msgPtr == null) { return null; }
+        if (msgPtr == null)
+            return null;
 
-        //
-        int bufSize = (int)NativeLibraryManager.CoreFoundation.CFStringGetLength(msgPtr);
+        int bufSize = (int) NativeLibraryManager.CoreFoundation.CFStringGetLength(msgPtr);
         char[] buf = new char[bufSize];
 
-        for (int i = 0; i < buf.length; i++) {
+        for (int i = 0; i < buf.length; i++)
             buf[i] = NativeLibraryManager.CoreFoundation.CFStringGetCharacterAtIndex(msgPtr, i);
-        }
 
-        //
         NativeLibraryManager.CoreFoundation.CFRelease(msgPtr);
-
-        //
         return new String(buf);
     }
 
-} // class OSXKeychainBackend
+}

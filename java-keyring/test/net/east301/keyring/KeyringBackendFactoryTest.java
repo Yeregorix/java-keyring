@@ -1,21 +1,16 @@
-/**
- * @author  $Author$
- * @date    $Date$
- * @version $Revision$
- */
-
 package net.east301.keyring;
 
 import com.sun.jna.Platform;
-import java.util.Arrays;
-
 import net.east301.keyring.gnome.GNOMEKeyringBackend;
 import net.east301.keyring.memory.UncryptedMemoryBackend;
 import net.east301.keyring.osx.OSXKeychainBackend;
 import net.east301.keyring.windows.WindowsDPAPIBackend;
-import static org.junit.Assert.*;
-import static org.junit.Assume.*;
 import org.junit.Test;
+
+import java.util.Arrays;
+
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * Test of KeyringBackendFactory class
@@ -27,11 +22,9 @@ public class KeyringBackendFactoryTest {
      */
     @Test
     public void testCreate_0args() throws Exception {
-        //
         KeyringBackend backend = KeyringBackendFactory.create();
         assertNotNull(backend);
 
-        //
         if (Platform.isMac()) {
             assertTrue(backend instanceof OSXKeychainBackend);
         } else if (Platform.isWindows()) {
@@ -49,10 +42,8 @@ public class KeyringBackendFactoryTest {
      */
     @Test
     public void testCreate_String_OSXKeychain() throws Exception {
-        //
         assumeTrue(Platform.isMac());
 
-        //
         KeyringBackend backend = KeyringBackendFactory.create("OSXKeychain");
 
         assertNotNull(backend);
@@ -65,10 +56,8 @@ public class KeyringBackendFactoryTest {
      */
     @Test
     public void testCreate_String_WindowsDPAPI() throws Exception {
-        //
         assumeTrue(Platform.isWindows());
 
-        //
         KeyringBackend backend = KeyringBackendFactory.create("WindowsDPAPI");
 
         assertNotNull(backend);
@@ -81,7 +70,6 @@ public class KeyringBackendFactoryTest {
      */
     @Test
     public void testCreate_String_UncryptedMemory() throws Exception {
-        //
         KeyringBackend backend = KeyringBackendFactory.create("UncryptedMemory");
 
         assertNotNull(backend);
@@ -102,15 +90,13 @@ public class KeyringBackendFactoryTest {
      */
     @Test
     public void testGetAllBackendNames() {
-        //
         String[] backends = KeyringBackendFactory.getAllBackendNames();
 
-        //
-        assertTrue(backends.length == 4);
+        assertEquals(4, backends.length);
         assertTrue(Arrays.asList(backends).contains("OSXKeychain"));
         assertTrue(Arrays.asList(backends).contains("WindowsDPAPI"));
         assertTrue(Arrays.asList(backends).contains("GNOMEKeyring"));
         assertTrue(Arrays.asList(backends).contains("UncryptedMemory"));
     }
 
-} // class KeyringBackendFactoryTest
+}

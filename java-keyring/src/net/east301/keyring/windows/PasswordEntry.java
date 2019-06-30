@@ -1,9 +1,3 @@
-/**
- * @author  $Author$
- * @date    $Date$
- * @version $Revision$
- */
-
 package net.east301.keyring.windows;
 
 import java.io.Serializable;
@@ -14,6 +8,21 @@ import java.io.Serializable;
 class PasswordEntry implements Serializable {
 
     /**
+     * Service name
+     */
+    private String service;
+
+    /**
+     * Account name
+     */
+    private String account;
+
+    /**
+     * Password
+     */
+    private byte[] password;
+
+    /**
      * Initializes an instance of PasswordEntry
      *
      * @param service   Service name
@@ -21,66 +30,51 @@ class PasswordEntry implements Serializable {
      * @param password  Password
      */
     public PasswordEntry(String service, String account, byte[] password) {
-        m_service = service;
-        m_account = account;
-        m_password = password;
+        this.service = service;
+        this.account = account;
+        this.password = password;
     }
 
     /**
      * Returns service name
      */
     public String getService() {
-        return m_service;
+        return this.service;
     }
 
     /**
      * Sets service name
      */
     public void setService(String service) {
-        m_service = service;
+        this.service = service;
     }
 
     /**
      * Returns account name
      */
     public String getAccount() {
-        return m_account;
+        return this.account;
     }
 
     /**
      * Sets account name
      */
     public void setAccount(String account) {
-        m_account = account;
+        this.account = account;
     }
 
     /**
      * Returns password
      */
     public byte[] getPassword() {
-        return m_password;
+        return this.password;
     }
 
     /**
      * Sets password
      */
     public void setPassword(byte[] password) {
-        m_password = password;
+        this.password = password;
     }
 
-    /**
-     * Service name
-     */
-    private String m_service;
-
-    /**
-     * Account name
-     */
-    private String m_account;
-
-    /**
-     * Password
-     */
-    private byte[] m_password;
-
-} // class PasswordEntry
+}

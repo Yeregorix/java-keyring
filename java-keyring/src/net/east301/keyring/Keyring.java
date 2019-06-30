@@ -1,17 +1,18 @@
-/**
- * @author  $Author$
- * @date    $Date$
- * @version $Revision$
- */
-
 package net.east301.keyring;
 
 import net.east301.keyring.util.LockException;
+
+import java.nio.file.Path;
 
 /**
  * Keyring
  */
 public class Keyring {
+
+    /**
+     * Keyring backend
+     */
+    private final KeyringBackend backend;
 
     /**
      * Creates an instance of Keyring
@@ -35,22 +36,22 @@ public class Keyring {
      * @param backend   Keyring backend instance
      */
     private Keyring(KeyringBackend backend) {
-        m_backend = backend;
+        this.backend = backend;
     }
 
     /**
      * Returns keyring backend instance
      */
     public KeyringBackend getBackend() {
-        return m_backend;
+        return this.backend;
     }
 
     /**
      * Gets path to key store
      * (Proxy method of KeyringBackend.getKeyStorePath)
      */
-    public String getKeyStorePath() {
-        return m_backend.getKeyStorePath();
+    public Path getKeyStorePath() {
+        return this.backend.getKeyStorePath();
     }
 
     /**
@@ -59,8 +60,8 @@ public class Keyring {
      *
      * @param path  Path to key store
      */
-    public void setKeyStorePath(String path) {
-        m_backend.setKeyStorePath(path);
+    public void setKeyStorePath(Path path) {
+        this.backend.setKeyStorePath(path);
     }
 
     /**
@@ -68,7 +69,7 @@ public class Keyring {
      * (Proxy method of KeyringBackend.isKeyStorePathRequired)
      */
     public boolean isKeyStorePathRequired() {
-        return m_backend.isKeyStorePathRequired();
+        return this.backend.isKeyStorePathRequired();
     }
 
     /**
@@ -82,10 +83,8 @@ public class Keyring {
      *
      * @throws PasswordRetrievalException   Thrown when an error happened while getting password
      */
-    public String getPassword(String service, String account)
-            throws LockException, PasswordRetrievalException {
-
-        return m_backend.getPassword(service, account);
+    public String getPassword(String service, String account) throws LockException, PasswordRetrievalException {
+        return this.backend.getPassword(service, account);
     }
 
     /**
@@ -98,15 +97,8 @@ public class Keyring {
      *
      * @throws PasswordSaveException    Thrown when an error happened while saving the password
      */
-    public void setPassword(String service, String account, String password)
-            throws LockException, PasswordSaveException {
-
-        m_backend.setPassword(service, account, password);
+    public void setPassword(String service, String account, String password) throws LockException, PasswordSaveException {
+        this.backend.setPassword(service, account, password);
     }
 
-    /**
-     * Keyring backend
-     */
-    private KeyringBackend m_backend;
-
-} // class Keyring
+}

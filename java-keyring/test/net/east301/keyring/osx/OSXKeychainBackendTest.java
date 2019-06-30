@@ -1,17 +1,12 @@
-/**
- * @author  $Author$
- * @date    $Date$
- * @version $Revision$
- */
-
 package net.east301.keyring.osx;
 
 import com.sun.jna.Platform;
 import net.east301.keyring.BackendNotSupportedException;
 import net.east301.keyring.PasswordRetrievalException;
-import static org.junit.Assert.*;
-import static org.junit.Assume.*;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * Test of OSXKeychainBackend class
@@ -22,11 +17,9 @@ public class OSXKeychainBackendTest {
      * Test of setup method, of class OSXKeychainBackend.
      */
     @Test
-    public void testSetup() throws Exception {
-        //
+    public void testSetup() {
         assumeTrue(Platform.isMac());
 
-        //
         try {
             new OSXKeychainBackend().setup();
         } catch (BackendNotSupportedException ex) {
@@ -39,10 +32,7 @@ public class OSXKeychainBackendTest {
      */
     @Test
     public void testIsSupported() {
-        //
         assumeTrue(Platform.isMac());
-
-        //
         assertTrue(new OSXKeychainBackend().isSupported());
     }
 
@@ -51,10 +41,7 @@ public class OSXKeychainBackendTest {
      */
     @Test
     public void testIsKeyStorePathRequired() {
-        //
         assumeTrue(Platform.isMac());
-
-        //
         assertFalse(new OSXKeychainBackend().isKeyStorePathRequired());
     }
 
@@ -63,17 +50,13 @@ public class OSXKeychainBackendTest {
      */
     @Test
     public void testGetPassword() throws Exception {
-        //
         assumeTrue(Platform.isMac());
 
-        //
         OSXKeychainBackend backend = new OSXKeychainBackend();
         backend.setup();
 
-        //
-        checkExistanceOfPasswordEntry(backend);
+        checkExistenceOfPasswordEntry(backend);
 
-        //
         backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
         assertEquals(PASSWORD, backend.getPassword(SERVICE, ACCOUNT));
     }
@@ -83,14 +66,11 @@ public class OSXKeychainBackendTest {
      */
     @Test
     public void testSetPassword() throws Exception {
-        //
         assumeTrue(Platform.isMac());
 
-        //
         OSXKeychainBackend backend = new OSXKeychainBackend();
         backend.setup();
 
-        //
         backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
         assertEquals(PASSWORD, backend.getPassword(SERVICE, ACCOUNT));
     }
@@ -103,11 +83,7 @@ public class OSXKeychainBackendTest {
         assertEquals("OSXKeychain", new OSXKeychainBackend().getID());
     }
 
-    /**
-     *
-     * @param backend
-     */
-    private static void checkExistanceOfPasswordEntry(OSXKeychainBackend backend) {
+    private static void checkExistenceOfPasswordEntry(OSXKeychainBackend backend) {
         try {
             backend.getPassword(SERVICE, ACCOUNT);
 
@@ -120,19 +96,10 @@ public class OSXKeychainBackendTest {
         }
     }
 
-    /**
-     *
-     */
     private static final String SERVICE = "net.east301.keyring.osx unit test";
 
-    /**
-     *
-     */
     private static final String ACCOUNT = "tester";
 
-    /**
-     *
-     */
     private static final String PASSWORD = "HogeHoge2012";
 
-} // class OSXKeychainBackendTest
+}

@@ -1,27 +1,21 @@
-/**
- * @author  $Author$
- * @date    $Date$
- * @version $Revision$
- */
-
 package net.east301.keyring.windows;
 
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Crypt32Util;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.east301.keyring.KeyringBackend;
 import net.east301.keyring.PasswordRetrievalException;
 import net.east301.keyring.PasswordSaveException;
 import net.east301.keyring.util.FileBasedLock;
 import net.east301.keyring.util.LockException;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Keyring backend which uses Windows DPAPI
@@ -55,31 +49,27 @@ public class WindowsDPAPIBackend extends KeyringBackend {
      * @throws PasswordRetrievalException   Thrown when an error happened while getting password
      */
     @Override
-    public String getPassword(String service, String account)
-            throws LockException, PasswordRetrievalException {
-
+    public String getPassword(String service, String account) throws LockException, PasswordRetrievalException {
         FileBasedLock fileLock = new FileBasedLock(getLockPath());
 
         try {
-            //
             fileLock.lock();
 
-            //
             PasswordEntry targetEntry = null;
-
-            for (PasswordEntry entry : loadPasswordEntries()) {
-                if (entry.getService().equals(service) && entry.getAccount().equals(account)) {
-                    targetEntry = entry;
-                    break;
+            try {
+                for (PasswordEntry entry : loadPasswordEntries()) {
+                    if (entry.getService().equals(service) && entry.getAccount().equals(account)) {
+                        targetEntry = entry;
+                        break;
+                    }
                 }
+            } catch (Exception e) {
+                throw new PasswordRetrievalException("Failed to load password entries from the keystore", e);
             }
 
-            if (targetEntry == null) {
-                throw new PasswordRetrievalException(
-                        "Password related to the specified service and account is not found");
-            }
+            if (targetEntry == null)
+                throw new PasswordRetrievalException("Password related to the specified service and account is not found");
 
-            //
             byte[] decryptedBytes;
 
             try {
@@ -88,18 +78,12 @@ public class WindowsDPAPIBackend extends KeyringBackend {
                 throw new PasswordRetrievalException("Failed to decrypt password");
             }
 
-            //
-            try {
-                return new String(decryptedBytes, "UTF-8");
-            } catch (UnsupportedEncodingException ex) {
-                throw new PasswordRetrievalException("Unsupported encoding 'UTF-8' specified");
-            }
-
+            return new String(decryptedBytes, StandardCharsets.UTF_8);
         } finally {
             try {
                 fileLock.release();
-            } catch (Exception ex) {
-                Logger.getLogger(WindowsDPAPIBackend.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception e) {
+                Logger.getLogger("WindowsDPAPIBackend").log(Level.SEVERE, "Failed to release file lock", e);
             }
         }
     }
@@ -114,28 +98,25 @@ public class WindowsDPAPIBackend extends KeyringBackend {
      * @throws PasswordSaveException    Thrown when an error happened while saving the password
      */
     @Override
-    public void setPassword(String service, String account, String password)
-            throws LockException, PasswordSaveException {
-
+    public void setPassword(String service, String account, String password) throws LockException, PasswordSaveException {
         FileBasedLock fileLock = new FileBasedLock(getLockPath());
 
         try {
-            //
             fileLock.lock();
 
-            //
             byte[] encryptedBytes;
-
             try {
-                encryptedBytes = Crypt32Util.cryptProtectData(password.getBytes("UTF-8"));
-            } catch (UnsupportedEncodingException ex) {
-                throw new PasswordSaveException("Unsupported encoding 'UTF-8' specified");
-            } catch (Exception ex) {
-                throw new PasswordSaveException("Failed to encrypt password");
+                encryptedBytes = Crypt32Util.cryptProtectData(password.getBytes(StandardCharsets.UTF_8));
+            } catch (Exception e) {
+                throw new PasswordSaveException("Failed to encrypt password", e);
             }
 
-            //
-            ArrayList<PasswordEntry> entries = loadPasswordEntries();
+            ArrayList<PasswordEntry> entries;
+            try {
+                entries = loadPasswordEntries();
+            } catch (Exception e) {
+                throw new PasswordSaveException("Failed to load password entries from the keystore", e);
+            }
             PasswordEntry targetEntry = null;
 
             for (PasswordEntry entry : entries) {
@@ -145,19 +126,21 @@ public class WindowsDPAPIBackend extends KeyringBackend {
                 }
             }
 
-            if (targetEntry != null) {
+            if (targetEntry != null)
                 targetEntry.setPassword(encryptedBytes);
-            } else {
+            else
                 entries.add(new PasswordEntry(service, account, encryptedBytes));
-            }
 
-            //
-            savePasswordEnetires(entries);
+            try {
+                savePasswordEntries(entries);
+            } catch (Exception e) {
+                throw new PasswordSaveException("Failed to save password entries to the keystore", e);
+            }
         } finally {
             try {
                 fileLock.release();
-            } catch (Exception ex) {
-                Logger.getLogger(WindowsDPAPIBackend.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception e) {
+                Logger.getLogger("WindowsDPAPIBackend").log(Level.SEVERE, "Failed to release file lock", e);
             }
         }
     }
@@ -173,30 +156,21 @@ public class WindowsDPAPIBackend extends KeyringBackend {
     /**
      * Returns path to a file for lock
      */
-    public String getLockPath() {
-        return m_keyStorePath + ".lock";
+    public Path getLockPath() {
+        return this.keyStorePath.resolveSibling(this.keyStorePath.getFileName().toString() + ".lock");
     }
 
     /**
      * Loads password entries to a file.
      * This method is not thread/process safe.
      */
-    private ArrayList<PasswordEntry> loadPasswordEntries() {
-        ArrayList<PasswordEntry> entries = new ArrayList<PasswordEntry>();
-
-        try {
-        	ObjectInputStream fin = new ObjectInputStream(new FileInputStream(m_keyStorePath));
-            try {
-            	entries.addAll(Arrays.asList((PasswordEntry[])fin.readObject()));
+    private ArrayList<PasswordEntry> loadPasswordEntries() throws Exception {
+        if (Files.exists(this.keyStorePath) && Files.size(this.keyStorePath) > 0) {
+            try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(this.keyStorePath))) {
+                return new ArrayList<>(Arrays.asList((PasswordEntry[]) in.readObject()));
             }
-            finally {
-            	fin.close();
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(WindowsDPAPIBackend.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        return entries;
+        return new ArrayList<>();
     }
 
     /**
@@ -204,25 +178,12 @@ public class WindowsDPAPIBackend extends KeyringBackend {
      * This method is not thread/process safe.
      *
      * @param entries   Password entries to be saved
-     *
-     * @throws PasswordSaveException    Thrown when an error happened while writing to a file
      */
-    private void savePasswordEnetires(ArrayList<PasswordEntry> entries)
-            throws PasswordSaveException {
-
-        try {
-            ObjectOutputStream fout = new ObjectOutputStream(new FileOutputStream(m_keyStorePath));
-            try {
-	            fout.writeObject(entries.toArray(new PasswordEntry[0]));
-	            fout.flush();
-            }
-            finally {
-            	fout.close();
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(WindowsDPAPIBackend.class.getName()).log(Level.SEVERE, null, ex);
-            throw new PasswordSaveException("Failed to save password entries to a file");
+    private void savePasswordEntries(ArrayList<PasswordEntry> entries) throws Exception {
+        try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(this.keyStorePath))) {
+            out.writeObject(entries.toArray(new PasswordEntry[0]));
+            out.flush();
         }
     }
 
-} // class WindowsDPAPIBackend
+}
