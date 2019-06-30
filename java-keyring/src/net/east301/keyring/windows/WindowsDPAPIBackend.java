@@ -51,6 +51,9 @@ public class WindowsDPAPIBackend extends KeyringBackend {
 		if (bytes == null)
 			return null;
 
+		if (bytes.length == 0)
+			return "";
+
 		try {
 			return new String(Crypt32Util.cryptUnprotectData(bytes), StandardCharsets.UTF_8);
 		} catch (Exception e) {
@@ -70,10 +73,14 @@ public class WindowsDPAPIBackend extends KeyringBackend {
 		}
 
 		byte[] bytes;
-		try {
-			bytes = Crypt32Util.cryptProtectData(password.getBytes(StandardCharsets.UTF_8));
-		} catch (Exception e) {
-			throw new PasswordSaveException("Failed to encrypt password", e);
+		if (password.isEmpty()) {
+			bytes = new byte[0];
+		} else {
+			try {
+				bytes = Crypt32Util.cryptProtectData(password.getBytes(StandardCharsets.UTF_8));
+			} catch (Exception e) {
+				throw new PasswordSaveException("Failed to encrypt password", e);
+			}
 		}
 
 		map.put(new ServiceAndAccount(service, account), bytes);
