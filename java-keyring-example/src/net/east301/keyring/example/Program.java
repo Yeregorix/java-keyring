@@ -14,6 +14,7 @@ import java.util.logging.Logger;
  * Usage example of java-keyring library
  */
 public class Program {
+	private static final Logger logger = Logger.getLogger("Program");
 
     /**
      * @param args the command line arguments
@@ -33,8 +34,8 @@ public class Program {
         // If no supported backend is found, BackendNotSupportedException is thrown.
         try {
             keyring = Keyring.create();
-        } catch (BackendNotSupportedException ex) {
-            Logger.getLogger(Program.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (BackendNotSupportedException e) {
+			logger.log(Level.SEVERE, null, e);
             return;
         }
 
@@ -45,8 +46,8 @@ public class Program {
             try {
                 File keyStoreFile = File.createTempFile("keystore", ".keystore");
                 keyring.setKeyStorePath(keyStoreFile.toPath());
-            } catch (IOException ex) {
-                Logger.getLogger(Program.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException e) {
+				logger.log(Level.SEVERE, null, e);
             }
         }
 
@@ -59,8 +60,8 @@ public class Program {
         // LockException is thrown when keyring backend failed to lock key store file.
         try {
             keyring.setPassword("My service name", "My account name", "My password");
-        } catch (LockException | PasswordSaveException ex) {
-            Logger.getLogger(Program.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (PasswordSaveException e) {
+			logger.log(Level.SEVERE, null, e);
             return;
         }
 
@@ -74,8 +75,8 @@ public class Program {
         try {
             String password = keyring.getPassword("My service name", "My account name");
             System.out.println(password);
-        } catch (LockException | PasswordRetrievalException ex) {
-            Logger.getLogger(Program.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (PasswordRetrievalException e) {
+			logger.log(Level.SEVERE, null, e);
         }
     }
 }
