@@ -8,7 +8,7 @@
 
     <groupId>net.east301</groupId>
     <artifactId>java-keyring-parent</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <name>java-keyring-parent</name>
     <description>A Java library to store password securely</description>
     <url>https://bitbucket.org/east301/java-keyring/</url>
