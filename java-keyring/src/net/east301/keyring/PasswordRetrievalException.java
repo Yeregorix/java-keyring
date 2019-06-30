@@ -5,12 +5,12 @@ package net.east301.keyring;
  */
 public class PasswordRetrievalException extends Exception {
 
-    public PasswordRetrievalException(String message) {
-        super(message);
-    }
+	public PasswordRetrievalException(String message) {
+		super(message);
+	}
 
-    public PasswordRetrievalException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public PasswordRetrievalException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 }

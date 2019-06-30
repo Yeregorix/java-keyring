@@ -5,12 +5,12 @@ package net.east301.keyring;
  */
 public class PasswordSaveException extends Exception {
 
-    public PasswordSaveException(String message) {
-        super(message);
-    }
+	public PasswordSaveException(String message) {
+		super(message);
+	}
 
-    public PasswordSaveException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public PasswordSaveException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 }

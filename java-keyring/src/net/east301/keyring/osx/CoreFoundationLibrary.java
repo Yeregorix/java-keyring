@@ -8,14 +8,14 @@ import com.sun.jna.Pointer;
  */
 interface CoreFoundationLibrary extends Library {
 
-    long CFStringGetLength(              // CFIndex
-                                         Pointer theString);                 // CFStringRef
+	long CFStringGetLength(              // CFIndex
+										 Pointer theString);                 // CFStringRef
 
-    char CFStringGetCharacterAtIndex(    // UniChar
-                                         Pointer theString,                  // CFStringRef
-                                         long idx);                          // CFIndex
+	char CFStringGetCharacterAtIndex(    // UniChar
+										 Pointer theString,                  // CFStringRef
+										 long idx);                          // CFIndex
 
-    void CFRelease(                      // void
-                                         Pointer cf);                        // CFTypeRef
+	void CFRelease(                      // void
+										 Pointer cf);                        // CFTypeRef
 
 }

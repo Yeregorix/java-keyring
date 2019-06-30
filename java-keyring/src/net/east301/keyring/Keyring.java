@@ -7,96 +7,93 @@ import java.nio.file.Path;
  */
 public class Keyring {
 
-    /**
-     * Keyring backend
-     */
-    private final KeyringBackend backend;
+	/**
+	 * Keyring backend
+	 */
+	private final KeyringBackend backend;
 
-    /**
-     * Creates an instance of Keyring
-     */
-    public static Keyring create() throws BackendNotSupportedException {
-        return new Keyring(KeyringBackendFactory.create());
-    }
+	/**
+	 * Creates an instance of Keyring
+	 */
+	public static Keyring create() throws BackendNotSupportedException {
+		return new Keyring(KeyringBackendFactory.create());
+	}
 
-    /**
-     * Creates an instance of Keyring with specified backend
-     *
-     * @param backendType   Backend type
-     */
-    public static Keyring create(String backendType) throws BackendNotSupportedException {
-        return new Keyring(KeyringBackendFactory.create(backendType));
-    }
+	/**
+	 * Creates an instance of Keyring with specified backend
+	 *
+	 * @param backendType Backend type
+	 */
+	public static Keyring create(String backendType) throws BackendNotSupportedException {
+		return new Keyring(KeyringBackendFactory.create(backendType));
+	}
 
-    /**
-     * Initializes an instance of Keyring
-     *
-     * @param backend   Keyring backend instance
-     */
-    private Keyring(KeyringBackend backend) {
-        this.backend = backend;
-    }
+	/**
+	 * Initializes an instance of Keyring
+	 *
+	 * @param backend Keyring backend instance
+	 */
+	private Keyring(KeyringBackend backend) {
+		this.backend = backend;
+	}
 
-    /**
-     * Returns keyring backend instance
-     */
-    public KeyringBackend getBackend() {
-        return this.backend;
-    }
+	/**
+	 * Returns keyring backend instance
+	 */
+	public KeyringBackend getBackend() {
+		return this.backend;
+	}
 
-    /**
-     * Gets path to key store
-     * (Proxy method of KeyringBackend.getKeyStorePath)
-     */
-    public Path getKeyStorePath() {
-        return this.backend.getKeyStorePath();
-    }
+	/**
+	 * Gets path to key store
+	 * (Proxy method of KeyringBackend.getKeyStorePath)
+	 */
+	public Path getKeyStorePath() {
+		return this.backend.getKeyStorePath();
+	}
 
-    /**
-     * Sets path to key store
-     * (Proxy method of KeyringBackend.setKeyStorePath)
-     *
-     * @param path  Path to key store
-     */
-    public void setKeyStorePath(Path path) {
-        this.backend.setKeyStorePath(path);
-    }
+	/**
+	 * Sets path to key store
+	 * (Proxy method of KeyringBackend.setKeyStorePath)
+	 *
+	 * @param path Path to key store
+	 */
+	public void setKeyStorePath(Path path) {
+		this.backend.setKeyStorePath(path);
+	}
 
-    /**
-     * Returns true if the backend directory uses some file to store passwords
-     * (Proxy method of KeyringBackend.isKeyStorePathRequired)
-     */
-    public boolean isKeyStorePathRequired() {
-        return this.backend.isKeyStorePathRequired();
-    }
+	/**
+	 * Returns true if the backend directory uses some file to store passwords
+	 * (Proxy method of KeyringBackend.isKeyStorePathRequired)
+	 */
+	public boolean isKeyStorePathRequired() {
+		return this.backend.isKeyStorePathRequired();
+	}
 
-    /**
-     * Gets password from key store
-     * (Proxy method of KeyringBackend.getPassword)
-     *
-     * @param service   Service name
-     * @param account   Account name
-     *
-     * @return  Password related to specified service and account
-     *
-     * @throws PasswordRetrievalException   Thrown when an error happened while getting password
-     */
-    public String getPassword(String service, String account) throws PasswordRetrievalException {
-        return this.backend.getPassword(service, account);
-    }
+	/**
+	 * Gets password from key store
+	 * (Proxy method of KeyringBackend.getPassword)
+	 *
+	 * @param service Service name
+	 * @param account Account name
+	 * @return Password related to specified service and account
+	 * @throws PasswordRetrievalException Thrown when an error happened while getting password
+	 */
+	public String getPassword(String service, String account) throws PasswordRetrievalException {
+		return this.backend.getPassword(service, account);
+	}
 
-    /**
-     * Sets password to key store
-     * (Proxy method of KeyringBackend.setPassword)
-     *
-     * @param service   Service name
-     * @param account   Account name
-     * @param password  Password
-     *
-     * @throws PasswordSaveException    Thrown when an error happened while saving the password
-     */
-    public void setPassword(String service, String account, String password) throws PasswordSaveException {
-        this.backend.setPassword(service, account, password);
-    }
+	/**
+	 * Sets password to key store
+	 * (Proxy method of KeyringBackend.setPassword)
+	 *
+	 * @param service  Service name
+	 * @param account  Account name
+	 * @param password Password
+	 * @throws PasswordSaveException Thrown when an error happened while saving the password
+	 */
+	public void setPassword(String service, String account, String password) throws PasswordSaveException {
+		this.backend.setPassword(service, account, password);
+	}
 
 }

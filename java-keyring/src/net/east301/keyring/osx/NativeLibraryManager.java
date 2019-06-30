@@ -8,26 +8,26 @@ import net.east301.keyring.BackendNotSupportedException;
  */
 class NativeLibraryManager {
 
-    public static synchronized void loadNativeLibraries() throws BackendNotSupportedException {
-        if (CoreFoundation != null && Security != null)
-            return;
+	public static synchronized void loadNativeLibraries() throws BackendNotSupportedException {
+		if (CoreFoundation != null && Security != null)
+			return;
 
-        try {
-            CoreFoundation = (CoreFoundationLibrary) Native.loadLibrary("CoreFoundation", CoreFoundationLibrary.class);
-            Security = (SecurityLibrary) Native.loadLibrary("Security", SecurityLibrary.class);
-        } catch (UnsatisfiedLinkError e) {
-            throw new BackendNotSupportedException("Failed to load native library", e);
-        }
-    }
+		try {
+			CoreFoundation = (CoreFoundationLibrary) Native.loadLibrary("CoreFoundation", CoreFoundationLibrary.class);
+			Security = (SecurityLibrary) Native.loadLibrary("Security", SecurityLibrary.class);
+		} catch (UnsatisfiedLinkError e) {
+			throw new BackendNotSupportedException("Failed to load native library", e);
+		}
+	}
 
-    /**
-     * An instance of CoreFoundationLibrary
-     */
-    public static CoreFoundationLibrary CoreFoundation = null;
+	/**
+	 * An instance of CoreFoundationLibrary
+	 */
+	public static CoreFoundationLibrary CoreFoundation = null;
 
-    /**
-     * An instance of SecurityLibrary
-     */
-    public static SecurityLibrary Security = null;
+	/**
+	 * An instance of SecurityLibrary
+	 */
+	public static SecurityLibrary Security = null;
 
 }
