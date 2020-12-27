@@ -16,6 +16,8 @@ public interface Keyring {
 	 * Creates a keyring for the current OS.
 	 *
 	 * @param keyStore The key store.
+	 * @return The keyring.
+	 * @throws UnsupportedBackendException if there is no backend available.
 	 */
 	static Keyring create(Path keyStore) throws UnsupportedBackendException {
 		switch (Platform.getOSType()) {
