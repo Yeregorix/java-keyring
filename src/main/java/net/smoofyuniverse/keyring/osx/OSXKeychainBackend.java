@@ -4,8 +4,7 @@ import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 import net.smoofyuniverse.keyring.BackendNotSupportedException;
 import net.smoofyuniverse.keyring.KeyringBackend;
-import net.smoofyuniverse.keyring.PasswordRetrievalException;
-import net.smoofyuniverse.keyring.PasswordSaveException;
+import net.smoofyuniverse.keyring.PasswordAccessException;
 import net.smoofyuniverse.keyring.util.ServiceAndAccount;
 
 import java.nio.charset.StandardCharsets;
@@ -36,7 +35,7 @@ public class OSXKeychainBackend extends KeyringBackend {
 	}
 
 	@Override
-	public String getPassword(String service, String account) throws PasswordRetrievalException {
+	public String getPassword(String service, String account) throws PasswordAccessException {
 		ServiceAndAccount.validate(service, account);
 
 		byte[] serviceBytes = service.getBytes(StandardCharsets.UTF_8), accountBytes = account.getBytes(StandardCharsets.UTF_8);
@@ -53,7 +52,7 @@ public class OSXKeychainBackend extends KeyringBackend {
 			return null;
 
 		if (status != SecurityLibrary.ERR_SEC_SUCCESS)
-			throw new PasswordRetrievalException(convertErrorCodeToMessage(status));
+			throw new PasswordAccessException(convertErrorCodeToMessage(status));
 
 		byte[] passwordBytes = data[0].getByteArray(0, dataLength[0]);
 		NativeLibraryManager.Security.SecKeychainItemFreeContent(null, data[0]);
@@ -61,7 +60,7 @@ public class OSXKeychainBackend extends KeyringBackend {
 	}
 
 	@Override
-	public void setPassword(String service, String account, String password) throws PasswordSaveException {
+	public void setPassword(String service, String account, String password) throws PasswordAccessException {
 		ServiceAndAccount.validate(service, account);
 
 		byte[] serviceBytes = service.getBytes(StandardCharsets.UTF_8), accountBytes = account.getBytes(StandardCharsets.UTF_8), passwordBytes = password.getBytes(StandardCharsets.UTF_8);
@@ -74,7 +73,7 @@ public class OSXKeychainBackend extends KeyringBackend {
 				null, null, itemRef);
 
 		if (status != SecurityLibrary.ERR_SEC_SUCCESS && status != SecurityLibrary.ERR_SEC_ITEM_NOT_FOUND)
-			throw new PasswordSaveException(convertErrorCodeToMessage(status));
+			throw new PasswordAccessException(convertErrorCodeToMessage(status));
 
 		if (itemRef[0] != null) {
 			status = NativeLibraryManager.Security.SecKeychainItemModifyContent(
@@ -89,7 +88,7 @@ public class OSXKeychainBackend extends KeyringBackend {
 		}
 
 		if (status != 0)
-			throw new PasswordSaveException(convertErrorCodeToMessage(status));
+			throw new PasswordAccessException(convertErrorCodeToMessage(status));
 	}
 
 	/**

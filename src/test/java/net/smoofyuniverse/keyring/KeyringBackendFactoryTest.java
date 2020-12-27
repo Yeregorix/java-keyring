@@ -2,7 +2,6 @@ package net.smoofyuniverse.keyring;
 
 import com.sun.jna.Platform;
 import net.smoofyuniverse.keyring.gnome.GNOMEKeyringBackend;
-import net.smoofyuniverse.keyring.memory.UncryptedMemoryBackend;
 import net.smoofyuniverse.keyring.osx.OSXKeychainBackend;
 import net.smoofyuniverse.keyring.windows.WindowsDPAPIBackend;
 import org.junit.Test;
@@ -66,18 +65,6 @@ public class KeyringBackendFactoryTest {
 
 	/**
 	 * Test of create method, of class KeyringBackendFactory
-	 * by specifying UncryptedMemory.
-	 */
-	@Test
-	public void testCreate_String_UncryptedMemory() throws Exception {
-		KeyringBackend backend = KeyringBackendFactory.create("UncryptedMemory");
-
-		assertNotNull(backend);
-		assertTrue(backend instanceof UncryptedMemoryBackend);
-	}
-
-	/**
-	 * Test of create method, of class KeyringBackendFactory
 	 * by specifying invalid backend name.
 	 */
 	@Test(expected = BackendNotSupportedException.class)
@@ -92,11 +79,9 @@ public class KeyringBackendFactoryTest {
 	public void testGetAllBackendNames() {
 		String[] backends = KeyringBackendFactory.getAllBackendNames();
 
-		assertEquals(4, backends.length);
+		assertEquals(3, backends.length);
 		assertTrue(Arrays.asList(backends).contains("OSXKeychain"));
 		assertTrue(Arrays.asList(backends).contains("WindowsDPAPI"));
 		assertTrue(Arrays.asList(backends).contains("GNOMEKeyring"));
-		assertTrue(Arrays.asList(backends).contains("UncryptedMemory"));
 	}
-
 }

@@ -3,8 +3,7 @@ package net.smoofyuniverse.keyring.windows;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Crypt32Util;
 import net.smoofyuniverse.keyring.KeyringBackend;
-import net.smoofyuniverse.keyring.PasswordRetrievalException;
-import net.smoofyuniverse.keyring.PasswordSaveException;
+import net.smoofyuniverse.keyring.PasswordAccessException;
 import net.smoofyuniverse.keyring.util.ServiceAndAccount;
 
 import java.io.DataInputStream;
@@ -37,14 +36,14 @@ public class WindowsDPAPIBackend extends KeyringBackend {
 	}
 
 	@Override
-	public String getPassword(String service, String account) throws PasswordRetrievalException {
+	public String getPassword(String service, String account) throws PasswordAccessException {
 		ServiceAndAccount.validate(service, account);
 
 		Map<ServiceAndAccount, byte[]> map;
 		try {
 			map = loadEntries();
 		} catch (Exception e) {
-			throw new PasswordRetrievalException("Failed to load entries from the keystore", e);
+			throw new PasswordAccessException("Failed to load entries from the keystore", e);
 		}
 
 		byte[] bytes = map.get(new ServiceAndAccount(service, account));
@@ -57,19 +56,19 @@ public class WindowsDPAPIBackend extends KeyringBackend {
 		try {
 			return new String(Crypt32Util.cryptUnprotectData(bytes), StandardCharsets.UTF_8);
 		} catch (Exception e) {
-			throw new PasswordRetrievalException("Failed to decrypt password", e);
+			throw new PasswordAccessException("Failed to decrypt password", e);
 		}
 	}
 
 	@Override
-	public void setPassword(String service, String account, String password) throws PasswordSaveException {
+	public void setPassword(String service, String account, String password) throws PasswordAccessException {
 		ServiceAndAccount.validate(service, account);
 
 		Map<ServiceAndAccount, byte[]> map;
 		try {
 			map = loadEntries();
 		} catch (Exception e) {
-			throw new PasswordSaveException("Failed to load entries from the keystore", e);
+			throw new PasswordAccessException("Failed to load entries from the keystore", e);
 		}
 
 		byte[] bytes;
@@ -79,7 +78,7 @@ public class WindowsDPAPIBackend extends KeyringBackend {
 			try {
 				bytes = Crypt32Util.cryptProtectData(password.getBytes(StandardCharsets.UTF_8));
 			} catch (Exception e) {
-				throw new PasswordSaveException("Failed to encrypt password", e);
+				throw new PasswordAccessException("Failed to encrypt password", e);
 			}
 		}
 
@@ -88,7 +87,7 @@ public class WindowsDPAPIBackend extends KeyringBackend {
 		try {
 			saveEntries(map);
 		} catch (Exception e) {
-			throw new PasswordSaveException("Failed to save password entries to the keystore", e);
+			throw new PasswordAccessException("Failed to save password entries to the keystore", e);
 		}
 	}
 

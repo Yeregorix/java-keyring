@@ -43,9 +43,9 @@ public abstract class KeyringBackend {
 	 * @param service Service name
 	 * @param account Account name
 	 * @return Password related to specified service and account
-	 * @throws PasswordRetrievalException Thrown when an error happened while getting password
+	 * @throws PasswordAccessException Thrown when an error happened while getting the password
 	 */
-	public abstract String getPassword(String service, String account) throws PasswordRetrievalException;
+	public abstract String getPassword(String service, String account) throws PasswordAccessException;
 
 	/**
 	 * Sets password to key store
@@ -53,9 +53,9 @@ public abstract class KeyringBackend {
 	 * @param service  Service name
 	 * @param account  Account name
 	 * @param password Password
-	 * @throws PasswordSaveException Thrown when an error happened while saving the password
+	 * @throws PasswordAccessException Thrown when an error happened while saving the password
 	 */
-	public abstract void setPassword(String service, String account, String password) throws PasswordSaveException;
+	public abstract void setPassword(String service, String account, String password) throws PasswordAccessException;
 
 	/**
 	 * Gets backend ID

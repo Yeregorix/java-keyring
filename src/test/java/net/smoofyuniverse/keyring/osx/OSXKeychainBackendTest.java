@@ -2,7 +2,7 @@ package net.smoofyuniverse.keyring.osx;
 
 import com.sun.jna.Platform;
 import net.smoofyuniverse.keyring.BackendNotSupportedException;
-import net.smoofyuniverse.keyring.PasswordRetrievalException;
+import net.smoofyuniverse.keyring.PasswordAccessException;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -91,7 +91,7 @@ public class OSXKeychainBackendTest {
 					"Please remove password entry '%s' " +
 							"by using Keychain Access before running the tests%n",
 					SERVICE);
-		} catch (PasswordRetrievalException ex) {
+		} catch (PasswordAccessException ex) {
 			// do nothing
 		}
 	}

@@ -2,7 +2,6 @@ package net.smoofyuniverse.keyring;
 
 import com.sun.jna.Platform;
 import net.smoofyuniverse.keyring.gnome.GNOMEKeyringBackend;
-import net.smoofyuniverse.keyring.memory.UncryptedMemoryBackend;
 import net.smoofyuniverse.keyring.osx.OSXKeychainBackend;
 import net.smoofyuniverse.keyring.windows.WindowsDPAPIBackend;
 import org.junit.Test;
@@ -49,14 +48,6 @@ public class KeyringTest {
 			assertNotNull(keyring.getBackend());
 			assertTrue(keyring.getBackend() instanceof WindowsDPAPIBackend);
 		}
-
-//        if (true) {
-		keyring = Keyring.create("UncryptedMemory");
-
-		assertNotNull(keyring);
-		assertNotNull(keyring.getBackend());
-		assertTrue(keyring.getBackend() instanceof UncryptedMemoryBackend);
-//        }
 	}
 
 	/**
@@ -74,8 +65,6 @@ public class KeyringTest {
 			assertTrue(keyring.getBackend() instanceof WindowsDPAPIBackend);
 		} else if (Platform.isLinux()) {
 			assertTrue(keyring.getBackend() instanceof GNOMEKeyringBackend);
-		} else {
-			assertTrue(keyring.getBackend() instanceof UncryptedMemoryBackend);
 		}
 	}
 

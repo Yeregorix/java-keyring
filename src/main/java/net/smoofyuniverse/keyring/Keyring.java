@@ -77,9 +77,9 @@ public class Keyring {
 	 * @param service Service name
 	 * @param account Account name
 	 * @return Password related to specified service and account
-	 * @throws PasswordRetrievalException Thrown when an error happened while getting password
+	 * @throws PasswordAccessException Thrown when an error happened while getting the password
 	 */
-	public String getPassword(String service, String account) throws PasswordRetrievalException {
+	public String getPassword(String service, String account) throws PasswordAccessException {
 		return this.backend.getPassword(service, account);
 	}
 
@@ -90,9 +90,9 @@ public class Keyring {
 	 * @param service  Service name
 	 * @param account  Account name
 	 * @param password Password
-	 * @throws PasswordSaveException Thrown when an error happened while saving the password
+	 * @throws PasswordAccessException Thrown when an error happened while saving the password
 	 */
-	public void setPassword(String service, String account, String password) throws PasswordSaveException {
+	public void setPassword(String service, String account, String password) throws PasswordAccessException {
 		this.backend.setPassword(service, account, password);
 	}
 

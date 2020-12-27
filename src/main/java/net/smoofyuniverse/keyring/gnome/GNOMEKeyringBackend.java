@@ -5,8 +5,7 @@ import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 import net.smoofyuniverse.keyring.BackendNotSupportedException;
 import net.smoofyuniverse.keyring.KeyringBackend;
-import net.smoofyuniverse.keyring.PasswordRetrievalException;
-import net.smoofyuniverse.keyring.PasswordSaveException;
+import net.smoofyuniverse.keyring.PasswordAccessException;
 import net.smoofyuniverse.keyring.util.ServiceAndAccount;
 
 import java.io.DataInputStream;
@@ -47,14 +46,14 @@ public class GNOMEKeyringBackend extends KeyringBackend {
 	}
 
 	@Override
-	public String getPassword(String service, String account) throws PasswordRetrievalException {
+	public String getPassword(String service, String account) throws PasswordAccessException {
 		ServiceAndAccount.validate(service, account);
 
 		Map<ServiceAndAccount, Integer> map;
 		try {
 			map = loadEntries();
 		} catch (Exception e) {
-			throw new PasswordRetrievalException("Failed to load entries from the keystore", e);
+			throw new PasswordAccessException("Failed to load entries from the keystore", e);
 		}
 
 		Integer id = map.get(new ServiceAndAccount(service, account));
@@ -67,34 +66,34 @@ public class GNOMEKeyringBackend extends KeyringBackend {
 			if (result == 0)
 				return NativeLibraryManager.gklib.gnome_keyring_item_info_get_secret(item_info.getValue());
 
-			throw new PasswordRetrievalException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));
+			throw new PasswordAccessException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));
 		} finally {
 			NativeLibraryManager.gklib.gnome_keyring_item_info_free(item_info.getValue());
 		}
 	}
 
 	@Override
-	public void setPassword(String service, String account, String password) throws PasswordSaveException {
+	public void setPassword(String service, String account, String password) throws PasswordAccessException {
 		ServiceAndAccount.validate(service, account);
 
 		Map<ServiceAndAccount, Integer> map;
 		try {
 			map = loadEntries();
 		} catch (Exception e) {
-			throw new PasswordSaveException("Failed to load entries from the keystore", e);
+			throw new PasswordAccessException("Failed to load entries from the keystore", e);
 		}
 
 		IntByReference item_id = new IntByReference();
 		int result = NativeLibraryManager.gklib.gnome_keyring_set_network_password_sync(null, account, null, service, null, null, null, 0, password, item_id);
 		if (result != 0)
-			throw new PasswordSaveException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));
+			throw new PasswordAccessException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));
 
 		map.put(new ServiceAndAccount(service, account), item_id.getValue());
 
 		try {
 			saveEntries(map);
 		} catch (Exception e) {
-			throw new PasswordSaveException("Failed to save entries to the keystore", e);
+			throw new PasswordAccessException("Failed to save entries to the keystore", e);
 		}
 	}
 
