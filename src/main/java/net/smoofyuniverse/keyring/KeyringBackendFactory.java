@@ -1,7 +1,6 @@
 package net.smoofyuniverse.keyring;
 
 import net.smoofyuniverse.keyring.gnome.GNOMEKeyringBackend;
-import net.smoofyuniverse.keyring.memory.UncryptedMemoryBackend;
 import net.smoofyuniverse.keyring.osx.OSXKeychainBackend;
 import net.smoofyuniverse.keyring.windows.WindowsDPAPIBackend;
 
@@ -101,8 +100,6 @@ class KeyringBackendFactory {
 	private static final Object[][] KEYRING_BACKENDS = {
 			{"OSXKeychain", OSXKeychainBackend.class},
 			{"GNOMEKeyring", GNOMEKeyringBackend.class},
-			{"WindowsDPAPI", WindowsDPAPIBackend.class},
-			{"UncryptedMemory", UncryptedMemoryBackend.class}
+			{"WindowsDPAPI", WindowsDPAPIBackend.class}
 	};
-
 }
