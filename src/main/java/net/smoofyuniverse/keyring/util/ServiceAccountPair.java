@@ -13,9 +13,11 @@ public final class ServiceAccountPair {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof ServiceAccountPair)
-			return ((ServiceAccountPair) obj).service.equals(this.service) && ((ServiceAccountPair) obj).account.equals(this.account);
+	public boolean equals(Object o) {
+		if (o instanceof ServiceAccountPair) {
+			ServiceAccountPair other = (ServiceAccountPair) o;
+			return this.service.equals(other.service) && this.account.equals(other.account);
+		}
 		return false;
 	}
 
