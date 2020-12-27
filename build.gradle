@@ -1,0 +1,87 @@
+plugins {
+    id 'java'
+    id 'maven'
+    id 'signing'
+}
+
+group 'net.smoofyuniverse'
+archivesBaseName = 'java-keyring'
+version = '1.1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'net.java.dev.jna:jna:4.1.0'
+    compile 'net.java.dev.jna:jna-platform:4.1.0'
+    testImplementation 'junit:junit:4.13.1'
+}
+
+test {
+    useJUnit()
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'java-keyring'
+                packaging 'jar'
+                description 'Java API to store passwords.'
+                url 'https://github.com/Yeregorix/java-keyring'
+
+                scm {
+                    connection 'scm:git:https://github.com/Yeregorix/java-keyring.git'
+                    developerConnection 'scm:git:https://github.com/Yeregorix/java-keyring.git'
+                    url 'https://github.com/Yeregorix/java-keyring'
+                }
+
+                licenses {
+                    license {
+                        name 'Modified BSD License'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'Yeregorix'
+                        name 'Hugo Dupanloup'
+                        email 'yeregorix@smoofyuniverse.net'
+                    }
+                }
+            }
+        }
+    }
+}
