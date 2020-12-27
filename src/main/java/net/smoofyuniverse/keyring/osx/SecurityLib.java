@@ -7,8 +7,8 @@ import com.sun.jna.Pointer;
 /**
  * OS X Security library
  */
-public interface SecurityLibrary extends Library {
-	SecurityLibrary INSTANCE = Native.load("Security", SecurityLibrary.class);
+public interface SecurityLib extends Library {
+	SecurityLib INSTANCE = Native.load("Security", SecurityLib.class);
 
 	int ERR_SEC_SUCCESS = 0;
 	int ERR_SEC_ITEM_NOT_FOUND = -25300;

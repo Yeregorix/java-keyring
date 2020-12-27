@@ -16,8 +16,8 @@ public class OSXKeyring implements Keyring {
 
 	public OSXKeyring() throws UnsupportedBackendException {
 		try {
-			Objects.requireNonNull(CoreFoundationLibrary.INSTANCE);
-			Objects.requireNonNull(SecurityLibrary.INSTANCE);
+			Objects.requireNonNull(CoreFoundationLib.INSTANCE);
+			Objects.requireNonNull(SecurityLib.INSTANCE);
 		} catch (Throwable t) {
 			throw new UnsupportedBackendException("Failed to load native libraries", t);
 		}
@@ -37,19 +37,19 @@ public class OSXKeyring implements Keyring {
 		int[] dataLength = new int[1];
 		Pointer[] data = new Pointer[1];
 
-		int status = SecurityLibrary.INSTANCE.SecKeychainFindGenericPassword(
+		int status = SecurityLib.INSTANCE.SecKeychainFindGenericPassword(
 				null, serviceBytes.length, serviceBytes,
 				accountBytes.length, accountBytes,
 				dataLength, data, null);
 
-		if (status == SecurityLibrary.ERR_SEC_ITEM_NOT_FOUND)
+		if (status == SecurityLib.ERR_SEC_ITEM_NOT_FOUND)
 			return null;
 
-		if (status != SecurityLibrary.ERR_SEC_SUCCESS)
+		if (status != SecurityLib.ERR_SEC_SUCCESS)
 			throw new PasswordAccessException(convertErrorCodeToMessage(status));
 
 		byte[] passwordBytes = data[0].getByteArray(0, dataLength[0]);
-		SecurityLibrary.INSTANCE.SecKeychainItemFreeContent(null, data[0]);
+		SecurityLib.INSTANCE.SecKeychainItemFreeContent(null, data[0]);
 		return new String(passwordBytes, StandardCharsets.UTF_8);
 	}
 
@@ -61,21 +61,21 @@ public class OSXKeyring implements Keyring {
 
 		Pointer[] itemRef = new Pointer[1];
 
-		int status = SecurityLibrary.INSTANCE.SecKeychainFindGenericPassword(
+		int status = SecurityLib.INSTANCE.SecKeychainFindGenericPassword(
 				null, serviceBytes.length, serviceBytes,
 				accountBytes.length, accountBytes,
 				null, null, itemRef);
 
-		if (status != SecurityLibrary.ERR_SEC_SUCCESS && status != SecurityLibrary.ERR_SEC_ITEM_NOT_FOUND)
+		if (status != SecurityLib.ERR_SEC_SUCCESS && status != SecurityLib.ERR_SEC_ITEM_NOT_FOUND)
 			throw new PasswordAccessException(convertErrorCodeToMessage(status));
 
 		if (itemRef[0] != null) {
-			status = SecurityLibrary.INSTANCE.SecKeychainItemModifyContent(
+			status = SecurityLib.INSTANCE.SecKeychainItemModifyContent(
 					itemRef[0], null, passwordBytes.length, passwordBytes);
 
 			// TODO: add code to release itemRef[0]
 		} else {
-			status = SecurityLibrary.INSTANCE.SecKeychainAddGenericPassword(
+			status = SecurityLib.INSTANCE.SecKeychainAddGenericPassword(
 					Pointer.NULL, serviceBytes.length, serviceBytes,
 					accountBytes.length, accountBytes,
 					passwordBytes.length, passwordBytes, null);
@@ -91,17 +91,17 @@ public class OSXKeyring implements Keyring {
 	 * @param errorCode OSStat to be converted
 	 */
 	private String convertErrorCodeToMessage(int errorCode) {
-		Pointer msgPtr = SecurityLibrary.INSTANCE.SecCopyErrorMessageString(errorCode, null);
+		Pointer msgPtr = SecurityLib.INSTANCE.SecCopyErrorMessageString(errorCode, null);
 		if (msgPtr == null)
 			return null;
 
-		int bufSize = (int) CoreFoundationLibrary.INSTANCE.CFStringGetLength(msgPtr);
+		int bufSize = (int) CoreFoundationLib.INSTANCE.CFStringGetLength(msgPtr);
 		char[] buf = new char[bufSize];
 
 		for (int i = 0; i < buf.length; i++)
-			buf[i] = CoreFoundationLibrary.INSTANCE.CFStringGetCharacterAtIndex(msgPtr, i);
+			buf[i] = CoreFoundationLib.INSTANCE.CFStringGetCharacterAtIndex(msgPtr, i);
 
-		CoreFoundationLibrary.INSTANCE.CFRelease(msgPtr);
+		CoreFoundationLib.INSTANCE.CFRelease(msgPtr);
 		return new String(buf);
 	}
 }

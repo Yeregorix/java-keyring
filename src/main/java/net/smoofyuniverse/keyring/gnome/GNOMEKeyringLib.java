@@ -6,8 +6,8 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 
-public interface GKLib extends Library {
-	GKLib INSTANCE = Native.load("gnome-keyring", GKLib.class);
+public interface GNOMEKeyringLib extends Library {
+	GNOMEKeyringLib INSTANCE = Native.load("gnome-keyring", GNOMEKeyringLib.class);
 
 	int gnome_keyring_unlock_sync(String keyring, String password);
 

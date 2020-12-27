@@ -29,15 +29,14 @@ public class GNOMEKeyring implements Keyring {
 		this.keyStore = keyStore;
 
 		try {
-			Objects.requireNonNull(GKLib.INSTANCE);
-			Objects.requireNonNull(GLIB2.INSTANCE);
+			Objects.requireNonNull(GNOMEKeyringLib.INSTANCE);
 		} catch (Throwable t) {
-			throw new UnsupportedBackendException("Failed to load native libraries", t);
+			throw new UnsupportedBackendException("Failed to load native library", t);
 		}
 
-		int result = GKLib.INSTANCE.gnome_keyring_unlock_sync(null, null);
+		int result = GNOMEKeyringLib.INSTANCE.gnome_keyring_unlock_sync(null, null);
 		if (result != 0)
-			throw new UnsupportedBackendException(GKLib.INSTANCE.gnome_keyring_result_to_message(result));
+			throw new UnsupportedBackendException(GNOMEKeyringLib.INSTANCE.gnome_keyring_result_to_message(result));
 	}
 
 	@Override
@@ -57,13 +56,13 @@ public class GNOMEKeyring implements Keyring {
 
 		PointerByReference item_info = new PointerByReference();
 		try {
-			int result = GKLib.INSTANCE.gnome_keyring_item_get_info_full_sync(null, id, 1, item_info);
+			int result = GNOMEKeyringLib.INSTANCE.gnome_keyring_item_get_info_full_sync(null, id, 1, item_info);
 			if (result == 0)
-				return GKLib.INSTANCE.gnome_keyring_item_info_get_secret(item_info.getValue());
+				return GNOMEKeyringLib.INSTANCE.gnome_keyring_item_info_get_secret(item_info.getValue());
 
-			throw new PasswordAccessException(GKLib.INSTANCE.gnome_keyring_result_to_message(result));
+			throw new PasswordAccessException(GNOMEKeyringLib.INSTANCE.gnome_keyring_result_to_message(result));
 		} finally {
-			GKLib.INSTANCE.gnome_keyring_item_info_free(item_info.getValue());
+			GNOMEKeyringLib.INSTANCE.gnome_keyring_item_info_free(item_info.getValue());
 		}
 	}
 
@@ -74,9 +73,9 @@ public class GNOMEKeyring implements Keyring {
 		Map<ServiceAccountPair, Integer> map = loadEntries();
 
 		IntByReference item_id = new IntByReference();
-		int result = GKLib.INSTANCE.gnome_keyring_set_network_password_sync(null, account, null, service, null, null, null, 0, password, item_id);
+		int result = GNOMEKeyringLib.INSTANCE.gnome_keyring_set_network_password_sync(null, account, null, service, null, null, null, 0, password, item_id);
 		if (result != 0)
-			throw new PasswordAccessException(GKLib.INSTANCE.gnome_keyring_result_to_message(result));
+			throw new PasswordAccessException(GNOMEKeyringLib.INSTANCE.gnome_keyring_result_to_message(result));
 
 		map.put(new ServiceAccountPair(service, account), item_id.getValue());
 

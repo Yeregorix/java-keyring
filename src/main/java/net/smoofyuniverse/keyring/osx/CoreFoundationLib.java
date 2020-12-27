@@ -7,8 +7,8 @@ import com.sun.jna.Pointer;
 /**
  * OS X CoreFoundation library
  */
-public interface CoreFoundationLibrary extends Library {
-	CoreFoundationLibrary INSTANCE = Native.load("CoreFoundation", CoreFoundationLibrary.class);
+public interface CoreFoundationLib extends Library {
+	CoreFoundationLib INSTANCE = Native.load("CoreFoundation", CoreFoundationLib.class);
 
 	long CFStringGetLength(              // CFIndex
 										 Pointer theString);                 // CFStringRef
