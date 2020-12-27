@@ -16,8 +16,7 @@ repositories {
 }
 
 dependencies {
-    compile 'net.java.dev.jna:jna:4.1.0'
-    compile 'net.java.dev.jna:jna-platform:4.1.0'
+    compile 'net.java.dev.jna:jna-platform:5.6.0'
     testImplementation 'junit:junit:4.13.1'
 }
 
