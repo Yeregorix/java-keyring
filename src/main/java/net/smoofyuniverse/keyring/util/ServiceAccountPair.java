@@ -4,18 +4,18 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public final class ServiceAndAccount {
+public final class ServiceAccountPair {
 	public final String service, account;
 
-	public ServiceAndAccount(String service, String account) {
+	public ServiceAccountPair(String service, String account) {
 		this.service = service;
 		this.account = account;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof ServiceAndAccount)
-			return ((ServiceAndAccount) obj).service.equals(this.service) && ((ServiceAndAccount) obj).account.equals(this.account);
+		if (obj instanceof ServiceAccountPair)
+			return ((ServiceAccountPair) obj).service.equals(this.service) && ((ServiceAccountPair) obj).account.equals(this.account);
 		return false;
 	}
 
@@ -32,8 +32,8 @@ public final class ServiceAndAccount {
 		out.writeUTF(this.account);
 	}
 
-	public static ServiceAndAccount read(DataInputStream in) throws IOException {
-		return new ServiceAndAccount(in.readUTF(), in.readUTF());
+	public static ServiceAccountPair read(DataInputStream in) throws IOException {
+		return new ServiceAccountPair(in.readUTF(), in.readUTF());
 	}
 
 	public static void validate(String service, String account) {

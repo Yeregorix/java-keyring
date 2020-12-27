@@ -1,12 +1,14 @@
 package net.smoofyuniverse.keyring.osx;
 
 import com.sun.jna.Library;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 /**
  * OS X Security library
  */
-interface SecurityLibrary extends Library {
+public interface SecurityLibrary extends Library {
+	SecurityLibrary INSTANCE = Native.load("Security", SecurityLibrary.class);
 
 	int ERR_SEC_SUCCESS = 0;
 	int ERR_SEC_ITEM_NOT_FOUND = -25300;
@@ -47,5 +49,4 @@ interface SecurityLibrary extends Library {
 	int SecKeychainItemFreeContent(      // OSStatus
 										 Pointer[] attrList,                 // SecKeychainAttributeList*
 										 Pointer data);                      // void*
-
 }

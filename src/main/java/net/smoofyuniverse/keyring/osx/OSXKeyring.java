@@ -1,49 +1,43 @@
 package net.smoofyuniverse.keyring.osx;
 
-import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
-import net.smoofyuniverse.keyring.BackendNotSupportedException;
-import net.smoofyuniverse.keyring.KeyringBackend;
+import net.smoofyuniverse.keyring.Keyring;
 import net.smoofyuniverse.keyring.PasswordAccessException;
-import net.smoofyuniverse.keyring.util.ServiceAndAccount;
+import net.smoofyuniverse.keyring.UnsupportedBackendException;
+import net.smoofyuniverse.keyring.util.ServiceAccountPair;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
- * Keyring backend which uses OS X Keychain
+ * Keyring using OS X Keychain.
  */
-public class OSXKeychainBackend extends KeyringBackend {
+public class OSXKeyring implements Keyring {
+
+	public OSXKeyring() throws UnsupportedBackendException {
+		try {
+			Objects.requireNonNull(CoreFoundationLibrary.INSTANCE);
+			Objects.requireNonNull(SecurityLibrary.INSTANCE);
+		} catch (Throwable t) {
+			throw new UnsupportedBackendException("Failed to load native libraries", t);
+		}
+	}
 
 	@Override
-	public String getID() {
+	public String getBackendName() {
 		return "OSXKeychain";
 	}
 
 	@Override
-	public void setup() throws BackendNotSupportedException {
-		NativeLibraryManager.loadNativeLibraries();
-	}
-
-	@Override
-	public boolean isSupported() {
-		return Platform.isMac();
-	}
-
-	@Override
-	public boolean isKeyStorePathRequired() {
-		return false;
-	}
-
-	@Override
 	public String getPassword(String service, String account) throws PasswordAccessException {
-		ServiceAndAccount.validate(service, account);
+		ServiceAccountPair.validate(service, account);
 
 		byte[] serviceBytes = service.getBytes(StandardCharsets.UTF_8), accountBytes = account.getBytes(StandardCharsets.UTF_8);
 
 		int[] dataLength = new int[1];
 		Pointer[] data = new Pointer[1];
 
-		int status = NativeLibraryManager.Security.SecKeychainFindGenericPassword(
+		int status = SecurityLibrary.INSTANCE.SecKeychainFindGenericPassword(
 				null, serviceBytes.length, serviceBytes,
 				accountBytes.length, accountBytes,
 				dataLength, data, null);
@@ -55,19 +49,19 @@ public class OSXKeychainBackend extends KeyringBackend {
 			throw new PasswordAccessException(convertErrorCodeToMessage(status));
 
 		byte[] passwordBytes = data[0].getByteArray(0, dataLength[0]);
-		NativeLibraryManager.Security.SecKeychainItemFreeContent(null, data[0]);
+		SecurityLibrary.INSTANCE.SecKeychainItemFreeContent(null, data[0]);
 		return new String(passwordBytes, StandardCharsets.UTF_8);
 	}
 
 	@Override
 	public void setPassword(String service, String account, String password) throws PasswordAccessException {
-		ServiceAndAccount.validate(service, account);
+		ServiceAccountPair.validate(service, account);
 
 		byte[] serviceBytes = service.getBytes(StandardCharsets.UTF_8), accountBytes = account.getBytes(StandardCharsets.UTF_8), passwordBytes = password.getBytes(StandardCharsets.UTF_8);
 
 		Pointer[] itemRef = new Pointer[1];
 
-		int status = NativeLibraryManager.Security.SecKeychainFindGenericPassword(
+		int status = SecurityLibrary.INSTANCE.SecKeychainFindGenericPassword(
 				null, serviceBytes.length, serviceBytes,
 				accountBytes.length, accountBytes,
 				null, null, itemRef);
@@ -76,12 +70,12 @@ public class OSXKeychainBackend extends KeyringBackend {
 			throw new PasswordAccessException(convertErrorCodeToMessage(status));
 
 		if (itemRef[0] != null) {
-			status = NativeLibraryManager.Security.SecKeychainItemModifyContent(
+			status = SecurityLibrary.INSTANCE.SecKeychainItemModifyContent(
 					itemRef[0], null, passwordBytes.length, passwordBytes);
 
 			// TODO: add code to release itemRef[0]
 		} else {
-			status = NativeLibraryManager.Security.SecKeychainAddGenericPassword(
+			status = SecurityLibrary.INSTANCE.SecKeychainAddGenericPassword(
 					Pointer.NULL, serviceBytes.length, serviceBytes,
 					accountBytes.length, accountBytes,
 					passwordBytes.length, passwordBytes, null);
@@ -97,18 +91,17 @@ public class OSXKeychainBackend extends KeyringBackend {
 	 * @param errorCode OSStat to be converted
 	 */
 	private String convertErrorCodeToMessage(int errorCode) {
-		Pointer msgPtr = NativeLibraryManager.Security.SecCopyErrorMessageString(errorCode, null);
+		Pointer msgPtr = SecurityLibrary.INSTANCE.SecCopyErrorMessageString(errorCode, null);
 		if (msgPtr == null)
 			return null;
 
-		int bufSize = (int) NativeLibraryManager.CoreFoundation.CFStringGetLength(msgPtr);
+		int bufSize = (int) CoreFoundationLibrary.INSTANCE.CFStringGetLength(msgPtr);
 		char[] buf = new char[bufSize];
 
 		for (int i = 0; i < buf.length; i++)
-			buf[i] = NativeLibraryManager.CoreFoundation.CFStringGetCharacterAtIndex(msgPtr, i);
+			buf[i] = CoreFoundationLibrary.INSTANCE.CFStringGetCharacterAtIndex(msgPtr, i);
 
-		NativeLibraryManager.CoreFoundation.CFRelease(msgPtr);
+		CoreFoundationLibrary.INSTANCE.CFRelease(msgPtr);
 		return new String(buf);
 	}
-
 }

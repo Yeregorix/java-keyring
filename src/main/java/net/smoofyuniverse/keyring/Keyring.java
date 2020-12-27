@@ -1,99 +1,60 @@
 package net.smoofyuniverse.keyring;
 
+import com.sun.jna.Platform;
+import net.smoofyuniverse.keyring.gnome.GNOMEKeyring;
+import net.smoofyuniverse.keyring.osx.OSXKeyring;
+import net.smoofyuniverse.keyring.windows.WindowsDPAPIKeyring;
+
 import java.nio.file.Path;
 
 /**
- * Keyring
+ * A keyring.
  */
-public class Keyring {
+public interface Keyring {
 
 	/**
-	 * Keyring backend
-	 */
-	private final KeyringBackend backend;
-
-	/**
-	 * Creates an instance of Keyring
-	 */
-	public static Keyring create() throws BackendNotSupportedException {
-		return new Keyring(KeyringBackendFactory.create());
-	}
-
-	/**
-	 * Creates an instance of Keyring with specified backend
+	 * Creates a keyring for the current OS.
 	 *
-	 * @param backendType Backend type
+	 * @param keyStore The key store.
 	 */
-	public static Keyring create(String backendType) throws BackendNotSupportedException {
-		return new Keyring(KeyringBackendFactory.create(backendType));
+	static Keyring create(Path keyStore) throws UnsupportedBackendException {
+		switch (Platform.getOSType()) {
+			case Platform.MAC:
+				return new OSXKeyring();
+			case Platform.LINUX:
+				return new GNOMEKeyring(keyStore);
+			case Platform.WINDOWS:
+			case Platform.WINDOWSCE:
+				return new WindowsDPAPIKeyring(keyStore);
+			default:
+				throw new UnsupportedBackendException("Unsupported OS");
+		}
 	}
 
 	/**
-	 * Initializes an instance of Keyring
+	 * Gets the name of the backend.
 	 *
-	 * @param backend Keyring backend instance
+	 * @return The name.
 	 */
-	private Keyring(KeyringBackend backend) {
-		this.backend = backend;
-	}
+	String getBackendName();
 
 	/**
-	 * Returns keyring backend instance
-	 */
-	public KeyringBackend getBackend() {
-		return this.backend;
-	}
-
-	/**
-	 * Gets path to key store
-	 * (Proxy method of KeyringBackend.getKeyStorePath)
-	 */
-	public Path getKeyStorePath() {
-		return this.backend.getKeyStorePath();
-	}
-
-	/**
-	 * Sets path to key store
-	 * (Proxy method of KeyringBackend.setKeyStorePath)
+	 * Gets a password for the specified service and account.
 	 *
-	 * @param path Path to key store
+	 * @param service The service.
+	 * @param account The account.
+	 * @return The password.
+	 * @throws PasswordAccessException if any exception occurs while getting the password.
 	 */
-	public void setKeyStorePath(Path path) {
-		this.backend.setKeyStorePath(path);
-	}
+	String getPassword(String service, String account) throws PasswordAccessException;
 
 	/**
-	 * Returns true if the backend directory uses some file to store passwords
-	 * (Proxy method of KeyringBackend.isKeyStorePathRequired)
-	 */
-	public boolean isKeyStorePathRequired() {
-		return this.backend.isKeyStorePathRequired();
-	}
-
-	/**
-	 * Gets password from key store
-	 * (Proxy method of KeyringBackend.getPassword)
+	 * Sets a password for the specified service and account.
 	 *
-	 * @param service Service name
-	 * @param account Account name
-	 * @return Password related to specified service and account
-	 * @throws PasswordAccessException Thrown when an error happened while getting the password
+	 * @param service  The service.
+	 * @param account  The account.
+	 * @param password The password.
+	 * @throws PasswordAccessException if any exception occurs while saving the password.
 	 */
-	public String getPassword(String service, String account) throws PasswordAccessException {
-		return this.backend.getPassword(service, account);
-	}
-
-	/**
-	 * Sets password to key store
-	 * (Proxy method of KeyringBackend.setPassword)
-	 *
-	 * @param service  Service name
-	 * @param account  Account name
-	 * @param password Password
-	 * @throws PasswordAccessException Thrown when an error happened while saving the password
-	 */
-	public void setPassword(String service, String account, String password) throws PasswordAccessException {
-		this.backend.setPassword(service, account, password);
-	}
-
+	void setPassword(String service, String account, String password) throws PasswordAccessException;
 }

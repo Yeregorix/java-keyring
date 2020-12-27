@@ -1,12 +1,14 @@
 package net.smoofyuniverse.keyring.osx;
 
 import com.sun.jna.Library;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 /**
  * OS X CoreFoundation library
  */
-interface CoreFoundationLibrary extends Library {
+public interface CoreFoundationLibrary extends Library {
+	CoreFoundationLibrary INSTANCE = Native.load("CoreFoundation", CoreFoundationLibrary.class);
 
 	long CFStringGetLength(              // CFIndex
 										 Pointer theString);                 // CFStringRef
@@ -17,5 +19,4 @@ interface CoreFoundationLibrary extends Library {
 
 	void CFRelease(                      // void
 										 Pointer cf);                        // CFTypeRef
-
 }
