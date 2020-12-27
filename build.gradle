@@ -71,6 +71,7 @@ uploadArchives {
                 licenses {
                     license {
                         name 'Modified BSD License'
+                        url 'https://opensource.org/licenses/BSD-3-Clause'
                     }
                 }
 
