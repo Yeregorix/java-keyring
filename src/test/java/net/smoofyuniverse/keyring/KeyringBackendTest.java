@@ -36,7 +36,7 @@ public class KeyringBackendTest {
 		assertEquals(Paths.get("/path/to/keystore"), instance.getKeyStorePath());
 	}
 
-	public class KeyringBackendImpl extends KeyringBackend {
+	public static class KeyringBackendImpl extends KeyringBackend {
 
 		@Override
 		public boolean isSupported() {

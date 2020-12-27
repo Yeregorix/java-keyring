@@ -151,7 +151,7 @@ public class KeyringTest {
 		try {
 			keyring.getPassword(SERVICE, ACCOUNT);
 
-			System.err.println(String.format("Please remove password entry '%s' before running the tests", SERVICE));
+			System.err.printf("Please remove password entry '%s' before running the tests%n", SERVICE);
 		} catch (Exception ex) {
 			// do nothing
 		}

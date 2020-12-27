@@ -8,7 +8,7 @@ Summary
 -------
 
 java-keyring is a small library which provides a Java API to store passwords and secrets.
-Currently Mac OS X, Windows and Linux (GNOME) are supported.
+Currently, Mac OS X, Windows and Linux (GNOME) are supported.
 
 * __Mac OS X__
     * Passwords are stored using [OS X Keychain](http://developer.apple.com/documentation/Security/).

@@ -13,8 +13,8 @@ class NativeLibraryManager {
 			return;
 
 		try {
-			glib2 = (GLIB2) Native.loadLibrary("glib-2.0", GLIB2.class);
-			gklib = (GKLib) Native.loadLibrary("gnome-keyring", GKLib.class);
+			glib2 = Native.load("glib-2.0", GLIB2.class);
+			gklib = Native.load("gnome-keyring", GKLib.class);
 		} catch (UnsatisfiedLinkError e) {
 			throw new BackendNotSupportedException("Failed to load native library", e);
 		}

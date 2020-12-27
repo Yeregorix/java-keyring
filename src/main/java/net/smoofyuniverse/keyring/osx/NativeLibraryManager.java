@@ -13,8 +13,8 @@ class NativeLibraryManager {
 			return;
 
 		try {
-			CoreFoundation = (CoreFoundationLibrary) Native.loadLibrary("CoreFoundation", CoreFoundationLibrary.class);
-			Security = (SecurityLibrary) Native.loadLibrary("Security", SecurityLibrary.class);
+			CoreFoundation = Native.load("CoreFoundation", CoreFoundationLibrary.class);
+			Security = Native.load("Security", SecurityLibrary.class);
 		} catch (UnsatisfiedLinkError e) {
 			throw new BackendNotSupportedException("Failed to load native library", e);
 		}

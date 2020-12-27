@@ -56,6 +56,7 @@ public class WindowsDPAPIBackendTest {
 	 * Test of getPassword method, of class WindowsDPAPIBackend
 	 * by specifying valid entry.
 	 */
+	@Test
 	public void testGetPassword_ValidEntry() throws Exception {
 		assumeTrue(Platform.isWindows());
 

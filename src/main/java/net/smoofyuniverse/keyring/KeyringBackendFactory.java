@@ -17,7 +17,6 @@ class KeyringBackendFactory {
 	 */
 	public static KeyringBackend create() throws BackendNotSupportedException {
 		for (Object[] entry : KeyringBackendFactory.KEYRING_BACKENDS) {
-			String name = (String) entry[0];
 			Class cls = (Class) entry[1];
 
 			KeyringBackend backend = tryToCreateBackend(cls);
@@ -99,7 +98,7 @@ class KeyringBackendFactory {
 	/**
 	 * All keyring backends
 	 */
-	private static Object[][] KEYRING_BACKENDS = {
+	private static final Object[][] KEYRING_BACKENDS = {
 			{"OSXKeychain", OSXKeychainBackend.class},
 			{"GNOMEKeyring", GNOMEKeyringBackend.class},
 			{"WindowsDPAPI", WindowsDPAPIBackend.class},

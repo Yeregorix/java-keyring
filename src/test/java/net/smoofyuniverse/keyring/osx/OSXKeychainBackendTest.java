@@ -87,10 +87,10 @@ public class OSXKeychainBackendTest {
 		try {
 			backend.getPassword(SERVICE, ACCOUNT);
 
-			System.err.println(String.format(
+			System.err.printf(
 					"Please remove password entry '%s' " +
-							"by using Keychain Access before running the tests",
-					SERVICE));
+							"by using Keychain Access before running the tests%n",
+					SERVICE);
 		} catch (PasswordRetrievalException ex) {
 			// do nothing
 		}
