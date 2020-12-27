@@ -5,7 +5,7 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 /**
- * OS X CoreFoundation library
+ * OS X CoreFoundation library.
  */
 public interface CoreFoundationLib extends Library {
 	CoreFoundationLib INSTANCE = Native.load("CoreFoundation", CoreFoundationLib.class);

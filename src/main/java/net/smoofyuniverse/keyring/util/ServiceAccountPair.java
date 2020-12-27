@@ -4,9 +4,26 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+/**
+ * A service and account pair.
+ */
 public final class ServiceAccountPair {
-	public final String service, account;
+	/**
+	 * The service.
+	 */
+	public final String service;
 
+	/**
+	 * The account.
+	 */
+	public final String account;
+
+	/**
+	 * Creates a pair.
+	 *
+	 * @param service The service.
+	 * @param account The account.
+	 */
 	public ServiceAccountPair(String service, String account) {
 		this.service = service;
 		this.account = account;
@@ -29,15 +46,34 @@ public final class ServiceAccountPair {
 		return hash;
 	}
 
+	/**
+	 * Writes the pair as two UTF-8 strings.
+	 *
+	 * @param out The output stream.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	public void write(DataOutputStream out) throws IOException {
 		out.writeUTF(this.service);
 		out.writeUTF(this.account);
 	}
 
+	/**
+	 * Reads a pair as two UTF-8 strings.
+	 *
+	 * @param in The input stream.
+	 * @return The new pair.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	public static ServiceAccountPair read(DataInputStream in) throws IOException {
 		return new ServiceAccountPair(in.readUTF(), in.readUTF());
 	}
 
+	/**
+	 * Validates the service and the account.
+	 *
+	 * @param service The service.
+	 * @param account The account.
+	 */
 	public static void validate(String service, String account) {
 		if (service == null || service.isEmpty())
 			throw new IllegalArgumentException("service");

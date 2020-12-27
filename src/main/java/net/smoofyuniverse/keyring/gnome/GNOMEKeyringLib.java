@@ -6,6 +6,9 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 
+/**
+ * GNOME Keyring library.
+ */
 public interface GNOMEKeyringLib extends Library {
 	GNOMEKeyringLib INSTANCE = Native.load("gnome-keyring", GNOMEKeyringLib.class);
 

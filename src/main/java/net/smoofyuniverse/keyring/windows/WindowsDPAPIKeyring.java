@@ -19,11 +19,17 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 /**
- * Keyring using Windows DPAPI.
+ * A keyring using Windows DPAPI.
  */
 public class WindowsDPAPIKeyring implements Keyring {
 	private final Path keyStore;
 
+	/**
+	 * Creates a new keyring using Windows DPAPI.
+	 *
+	 * @param keyStore The key store used to save encrypted passwords.
+	 * @throws UnsupportedBackendException if the backend for this implementation is not available.
+	 */
 	public WindowsDPAPIKeyring(Path keyStore) throws UnsupportedBackendException {
 		if (keyStore == null)
 			throw new IllegalArgumentException("keyStore");

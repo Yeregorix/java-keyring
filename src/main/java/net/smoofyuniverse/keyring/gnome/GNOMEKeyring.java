@@ -18,11 +18,17 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 /**
- * Keyring using GNOME Keyring.
+ * A keyring using GNOME Keyring.
  */
 public class GNOMEKeyring implements Keyring {
 	private final Path keyStore;
 
+	/**
+	 * Creates a new keyring using GNOME Keyring.
+	 *
+	 * @param keyStore The key store used to save item ids.
+	 * @throws UnsupportedBackendException if the backend for this implementation is not available.
+	 */
 	public GNOMEKeyring(Path keyStore) throws UnsupportedBackendException {
 		if (keyStore == null)
 			throw new IllegalArgumentException("keyStore");

@@ -5,7 +5,7 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 /**
- * OS X Security library
+ * OS X Security library.
  */
 public interface SecurityLib extends Library {
 	SecurityLib INSTANCE = Native.load("Security", SecurityLib.class);

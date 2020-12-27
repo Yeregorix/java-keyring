@@ -10,10 +10,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /**
- * Keyring using OS X Keychain.
+ * A keyring using OS X Keychain.
  */
 public class OSXKeyring implements Keyring {
 
+	/**
+	 * Creates a new keyring using OS X Keychain.
+	 *
+	 * @throws UnsupportedBackendException if the backend for this implementation is not available.
+	 */
 	public OSXKeyring() throws UnsupportedBackendException {
 		try {
 			Objects.requireNonNull(CoreFoundationLib.INSTANCE);
