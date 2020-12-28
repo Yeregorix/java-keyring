@@ -62,7 +62,9 @@ public class OSXKeyring implements Keyring {
 	public void setPassword(String service, String account, String password) throws PasswordAccessException {
 		ServiceAccountPair.validate(service, account);
 
-		byte[] serviceBytes = service.getBytes(StandardCharsets.UTF_8), accountBytes = account.getBytes(StandardCharsets.UTF_8), passwordBytes = password.getBytes(StandardCharsets.UTF_8);
+		byte[] serviceBytes = service.getBytes(StandardCharsets.UTF_8),
+				accountBytes = account.getBytes(StandardCharsets.UTF_8),
+				passwordBytes = password.getBytes(StandardCharsets.UTF_8);
 
 		Pointer[] itemRef = new Pointer[1];
 
@@ -75,10 +77,12 @@ public class OSXKeyring implements Keyring {
 			throw new PasswordAccessException(convertErrorCodeToMessage(status));
 
 		if (itemRef[0] != null) {
-			status = SecurityLib.INSTANCE.SecKeychainItemModifyContent(
-					itemRef[0], null, passwordBytes.length, passwordBytes);
-
-			// TODO: add code to release itemRef[0]
+			try {
+				status = SecurityLib.INSTANCE.SecKeychainItemModifyContent(
+						itemRef[0], null, passwordBytes.length, passwordBytes);
+			} finally {
+				CoreFoundationLib.INSTANCE.CFRelease(itemRef[0]);
+			}
 		} else {
 			status = SecurityLib.INSTANCE.SecKeychainAddGenericPassword(
 					Pointer.NULL, serviceBytes.length, serviceBytes,
