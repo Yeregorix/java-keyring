@@ -11,6 +11,7 @@ import java.util.Objects;
 
 /**
  * A keyring using OS X Keychain.
+ * See https://developer.apple.com/documentation/security/keychain_services/keychain_items
  */
 public class OSXKeyring implements Keyring {
 
@@ -37,7 +38,8 @@ public class OSXKeyring implements Keyring {
 	public String getPassword(String service, String account) throws PasswordAccessException {
 		ServiceAccountPair.validate(service, account);
 
-		byte[] serviceBytes = service.getBytes(StandardCharsets.UTF_8), accountBytes = account.getBytes(StandardCharsets.UTF_8);
+		byte[] serviceBytes = service.getBytes(StandardCharsets.UTF_8),
+				accountBytes = account.getBytes(StandardCharsets.UTF_8);
 
 		int[] dataLength = new int[1];
 		Pointer[] data = new Pointer[1];
@@ -45,13 +47,13 @@ public class OSXKeyring implements Keyring {
 		int status = SecurityLib.INSTANCE.SecKeychainFindGenericPassword(
 				null, serviceBytes.length, serviceBytes,
 				accountBytes.length, accountBytes,
-				dataLength, data, null);
+				dataLength, data, null); // find password
 
 		if (status == SecurityLib.ERR_SEC_ITEM_NOT_FOUND)
 			return null;
 
 		if (status != SecurityLib.ERR_SEC_SUCCESS)
-			throw new PasswordAccessException(convertErrorCodeToMessage(status));
+			throw new PasswordAccessException(errorCodeToMessage(status));
 
 		byte[] passwordBytes = data[0].getByteArray(0, dataLength[0]);
 		SecurityLib.INSTANCE.SecKeychainItemFreeContent(null, data[0]);
@@ -63,35 +65,40 @@ public class OSXKeyring implements Keyring {
 		ServiceAccountPair.validate(service, account);
 
 		byte[] serviceBytes = service.getBytes(StandardCharsets.UTF_8),
-				accountBytes = account.getBytes(StandardCharsets.UTF_8),
-				passwordBytes = password.getBytes(StandardCharsets.UTF_8);
+				accountBytes = account.getBytes(StandardCharsets.UTF_8);
 
 		Pointer[] itemRef = new Pointer[1];
 
 		int status = SecurityLib.INSTANCE.SecKeychainFindGenericPassword(
 				null, serviceBytes.length, serviceBytes,
 				accountBytes.length, accountBytes,
-				null, null, itemRef);
+				null, null, itemRef); // find item
 
 		if (status != SecurityLib.ERR_SEC_SUCCESS && status != SecurityLib.ERR_SEC_ITEM_NOT_FOUND)
-			throw new PasswordAccessException(convertErrorCodeToMessage(status));
+			throw new PasswordAccessException(errorCodeToMessage(status));
 
 		if (itemRef[0] != null) {
 			try {
-				status = SecurityLib.INSTANCE.SecKeychainItemModifyContent(
-						itemRef[0], null, passwordBytes.length, passwordBytes);
+				if (password == null) { // delete
+					status = SecurityLib.INSTANCE.SecKeychainItemDelete(itemRef[0]);
+				} else { // modify
+					byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8);
+					status = SecurityLib.INSTANCE.SecKeychainItemModifyContent(
+							itemRef[0], null, passwordBytes.length, passwordBytes);
+				}
 			} finally {
 				CoreFoundationLib.INSTANCE.CFRelease(itemRef[0]);
 			}
-		} else {
+		} else if (password != null) { // set
+			byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8);
 			status = SecurityLib.INSTANCE.SecKeychainAddGenericPassword(
 					Pointer.NULL, serviceBytes.length, serviceBytes,
 					accountBytes.length, accountBytes,
 					passwordBytes.length, passwordBytes, null);
 		}
 
-		if (status != 0)
-			throw new PasswordAccessException(convertErrorCodeToMessage(status));
+		if (status != SecurityLib.ERR_SEC_SUCCESS)
+			throw new PasswordAccessException(errorCodeToMessage(status));
 	}
 
 	/**
@@ -99,7 +106,7 @@ public class OSXKeyring implements Keyring {
 	 *
 	 * @param errorCode OSStat to be converted
 	 */
-	private String convertErrorCodeToMessage(int errorCode) {
+	private String errorCodeToMessage(int errorCode) {
 		Pointer msgPtr = SecurityLib.INSTANCE.SecCopyErrorMessageString(errorCode, null);
 		if (msgPtr == null)
 			return null;
