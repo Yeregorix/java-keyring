@@ -45,7 +45,7 @@ public interface Keyring {
 	 *
 	 * @param service The service.
 	 * @param account The account.
-	 * @return The password.
+	 * @return The password or null if absent.
 	 * @throws PasswordAccessException if any exception occurs while getting the password.
 	 */
 	String getPassword(String service, String account) throws PasswordAccessException;
@@ -55,7 +55,7 @@ public interface Keyring {
 	 *
 	 * @param service  The service.
 	 * @param account  The account.
-	 * @param password The password.
+	 * @param password The password or null to remove.
 	 * @throws PasswordAccessException if any exception occurs while saving the password.
 	 */
 	void setPassword(String service, String account, String password) throws PasswordAccessException;
