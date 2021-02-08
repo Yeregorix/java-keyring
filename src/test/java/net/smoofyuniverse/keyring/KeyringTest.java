@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
  * Tests {@link Keyring}.
  */
 public class KeyringTest {
-	public static final String SERVICE = "java-keyring test", ACCOUNT = "tester";
+	public static final String SERVICE = "java-keyring", ACCOUNT = "test";
 
 	public static Keyring createTestKeyring() throws Exception {
 		return Keyring.create(Files.createTempFile("keystore", ".keystore"));

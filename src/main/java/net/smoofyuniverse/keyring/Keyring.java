@@ -3,7 +3,7 @@ package net.smoofyuniverse.keyring;
 import com.sun.jna.Platform;
 import net.smoofyuniverse.keyring.gnome.GNOMEKeyring;
 import net.smoofyuniverse.keyring.osx.OSXKeyring;
-import net.smoofyuniverse.keyring.windows.WindowsDPAPIKeyring;
+import net.smoofyuniverse.keyring.windows.WinCredentialKeyring;
 
 import java.nio.file.Path;
 
@@ -27,7 +27,7 @@ public interface Keyring {
 				return new GNOMEKeyring(keyStore);
 			case Platform.WINDOWS:
 			case Platform.WINDOWSCE:
-				return new WindowsDPAPIKeyring(keyStore);
+				return new WinCredentialKeyring();
 			default:
 				throw new UnsupportedBackendException("Unsupported OS");
 		}
