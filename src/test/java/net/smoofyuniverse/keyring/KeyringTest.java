@@ -2,51 +2,79 @@ package net.smoofyuniverse.keyring;
 
 import org.junit.Test;
 
-import static net.smoofyuniverse.keyring.TestConstants.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.security.SecureRandom;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests {@link Keyring}.
  */
 public class KeyringTest {
+	public static final String SERVICE = "java-keyring test", ACCOUNT = "tester";
+
+	public static Keyring createTestKeyring() throws Exception {
+		return Keyring.create(Files.createTempFile("keystore", ".keystore"));
+	}
+
+	public static String randomPassword(SecureRandom r) {
+		byte[] bytes = new byte[20];
+		r.nextBytes(bytes);
+		return new String(bytes, StandardCharsets.UTF_8);
+	}
 
 	/**
-	 * Tests {@link Keyring#create}.
+	 * Creates a new keyring.
 	 */
 	@Test
 	public void testCreate() throws Exception {
-		Keyring keyring = Keyring.create(createTempKeyStore());
+		Keyring keyring = createTestKeyring();
 		assertNotNull(keyring);
 	}
 
 	/**
-	 * Tests {@link Keyring#getBackendName}.
+	 * Gets the name of the backend.
 	 */
 	@Test
 	public void testGetBackendName() throws Exception {
-		Keyring keyring = Keyring.create(createTempKeyStore());
+		Keyring keyring = createTestKeyring();
 		assertNotNull(keyring.getBackendName());
 	}
 
 	/**
-	 * Tests {@link Keyring#getPassword}.
+	 * Removes any existing password, then gets it.
 	 */
 	@Test
-	public void testGetPassword() throws Exception {
-		Keyring keyring = Keyring.create(createTempKeyStore());
-		checkExistenceOfPasswordEntry(keyring);
-		keyring.setPassword(SERVICE, ACCOUNT, PASSWORD);
-		assertEquals(PASSWORD, keyring.getPassword(SERVICE, ACCOUNT));
+	public void testRemoveGetPassword() throws Exception {
+		Keyring keyring = createTestKeyring();
+		keyring.setPassword(SERVICE, ACCOUNT, null);
+		assertNull(keyring.getPassword(SERVICE, ACCOUNT));
 	}
 
 	/**
-	 * Tests {@link Keyring#setPassword}.
+	 * Sets a random password, then gets it.
 	 */
 	@Test
-	public void testSetPassword() throws Exception {
-		Keyring keyring = Keyring.create(createTempKeyStore());
-		keyring.setPassword(SERVICE, ACCOUNT, PASSWORD);
-		assertEquals(PASSWORD, keyring.getPassword(SERVICE, ACCOUNT));
+	public void testSetGetPassword() throws Exception {
+		Keyring keyring = createTestKeyring();
+		String password = randomPassword(new SecureRandom());
+		keyring.setPassword(SERVICE, ACCOUNT, password);
+		assertEquals(password, keyring.getPassword(SERVICE, ACCOUNT));
+	}
+
+	/**
+	 * Sets a random nullable password, then gets it.
+	 * Repeats 100 times.
+	 */
+	@Test
+	public void testMultipleSetGetPassword() throws Exception {
+		Keyring keyring = createTestKeyring();
+		SecureRandom r = new SecureRandom();
+		for (int i = 0; i < 100; i++) {
+			String password = r.nextBoolean() ? null : randomPassword(r);
+			keyring.setPassword(SERVICE, ACCOUNT, password);
+			assertEquals(password, keyring.getPassword(SERVICE, ACCOUNT));
+		}
 	}
 }
