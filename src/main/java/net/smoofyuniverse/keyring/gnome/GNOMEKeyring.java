@@ -15,7 +15,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 
 /**
  * A keyring using GNOME Keyring.
@@ -34,11 +33,8 @@ public class GNOMEKeyring implements Keyring {
 			throw new IllegalArgumentException("keyStore");
 		this.keyStore = keyStore;
 
-		try {
-			Objects.requireNonNull(GNOMEKeyringLib.INSTANCE);
-		} catch (Throwable t) {
-			throw new UnsupportedBackendException("Failed to load native library", t);
-		}
+		if (GNOMEKeyringLib.INSTANCE == null)
+			throw new UnsupportedBackendException("Failed to load native library");
 
 		int result = GNOMEKeyringLib.INSTANCE.gnome_keyring_unlock_sync(null, null);
 		if (result != 0)

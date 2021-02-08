@@ -1,16 +1,15 @@
 package net.smoofyuniverse.keyring.osx;
 
 import com.sun.jna.Library;
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
+import net.smoofyuniverse.keyring.util.NativeUtil;
 
 /**
  * OS X Security library.
  */
 public interface SecurityLib extends Library {
-	SecurityLib INSTANCE = Native.load("Security", SecurityLib.class);
+	SecurityLib INSTANCE = NativeUtil.loadOrNull("Security", SecurityLib.class);
 
-	int ERR_SEC_SUCCESS = 0;
 	int ERR_SEC_ITEM_NOT_FOUND = -25300;
 
 	int SecKeychainFindGenericPassword(  // OSStatus

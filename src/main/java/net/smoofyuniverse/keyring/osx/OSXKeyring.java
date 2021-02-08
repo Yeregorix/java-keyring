@@ -7,7 +7,6 @@ import net.smoofyuniverse.keyring.UnsupportedBackendException;
 import net.smoofyuniverse.keyring.util.ServiceAccountPair;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 /**
  * A keyring using OS X Keychain.
@@ -21,17 +20,13 @@ public class OSXKeyring implements Keyring {
 	 * @throws UnsupportedBackendException if the backend for this implementation is not available.
 	 */
 	public OSXKeyring() throws UnsupportedBackendException {
-		try {
-			Objects.requireNonNull(CoreFoundationLib.INSTANCE);
-			Objects.requireNonNull(SecurityLib.INSTANCE);
-		} catch (Throwable t) {
-			throw new UnsupportedBackendException("Failed to load native libraries", t);
-		}
+		if (CoreFoundationLib.INSTANCE == null || SecurityLib.INSTANCE == null)
+			throw new UnsupportedBackendException("Failed to load native libraries");
 	}
 
 	@Override
 	public String getBackendName() {
-		return "OSXKeychain";
+		return "OS X Keychain";
 	}
 
 	@Override
@@ -52,7 +47,7 @@ public class OSXKeyring implements Keyring {
 		if (status == SecurityLib.ERR_SEC_ITEM_NOT_FOUND)
 			return null;
 
-		if (status != SecurityLib.ERR_SEC_SUCCESS)
+		if (status != 0)
 			throw new PasswordAccessException(errorCodeToMessage(status));
 
 		byte[] passwordBytes = data[0].getByteArray(0, dataLength[0]);
@@ -74,7 +69,7 @@ public class OSXKeyring implements Keyring {
 				accountBytes.length, accountBytes,
 				null, null, itemRef); // find item
 
-		if (status != SecurityLib.ERR_SEC_SUCCESS && status != SecurityLib.ERR_SEC_ITEM_NOT_FOUND)
+		if (status != 0 && status != SecurityLib.ERR_SEC_ITEM_NOT_FOUND)
 			throw new PasswordAccessException(errorCodeToMessage(status));
 
 		if (itemRef[0] != null) {
@@ -97,7 +92,7 @@ public class OSXKeyring implements Keyring {
 					passwordBytes.length, passwordBytes, null);
 		}
 
-		if (status != SecurityLib.ERR_SEC_SUCCESS)
+		if (status != 0)
 			throw new PasswordAccessException(errorCodeToMessage(status));
 	}
 

@@ -1,16 +1,16 @@
 package net.smoofyuniverse.keyring.gnome;
 
 import com.sun.jna.Library;
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
+import net.smoofyuniverse.keyring.util.NativeUtil;
 
 /**
  * GNOME Keyring library.
  */
 public interface GNOMEKeyringLib extends Library {
-	GNOMEKeyringLib INSTANCE = Native.load("gnome-keyring", GNOMEKeyringLib.class);
+	GNOMEKeyringLib INSTANCE = NativeUtil.loadOrNull("gnome-keyring", GNOMEKeyringLib.class);
 
 	int gnome_keyring_unlock_sync(String keyring, String password);
 
