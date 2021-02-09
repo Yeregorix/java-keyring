@@ -2,7 +2,6 @@ package net.smoofyuniverse.keyring.windows;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
-import com.sun.jna.platform.win32.WinBase.FILETIME;
 
 import java.util.Arrays;
 import java.util.List;

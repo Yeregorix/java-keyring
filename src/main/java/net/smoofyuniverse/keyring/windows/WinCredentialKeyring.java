@@ -1,7 +1,7 @@
 package net.smoofyuniverse.keyring.windows;
 
 import com.sun.jna.Memory;
-import com.sun.jna.platform.win32.WinDef.DWORD;
+import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import net.smoofyuniverse.keyring.Keyring;
 import net.smoofyuniverse.keyring.PasswordAccessException;
@@ -23,7 +23,6 @@ public class WinCredentialKeyring implements Keyring {
 	public WinCredentialKeyring() throws UnsupportedBackendException {
 		if (Advapi32.INSTANCE == null || Kernel32.INSTANCE == null)
 			throw new UnsupportedBackendException("Failed to load native libraries");
-		// if we pass this check, then Crypt32.INSTANCE should be available
 	}
 
 	@Override
@@ -45,7 +44,7 @@ public class WinCredentialKeyring implements Keyring {
 		Keyring.validateAccount(account);
 
 		PointerByReference ref = new PointerByReference();
-		boolean success = Advapi32.INSTANCE.CredReadA(getTargetName(service, account), new DWORD(1L), new DWORD(0L), ref);
+		boolean success = Advapi32.INSTANCE.CredReadA(getTargetName(service, account), 1, 0, ref);
 		if (!success) {
 			int error = Kernel32.INSTANCE.GetLastError();
 			if (error == Advapi32.ERROR_NOT_FOUND)
@@ -75,7 +74,7 @@ public class WinCredentialKeyring implements Keyring {
 		boolean success;
 
 		if (password == null) {
-			success = Advapi32.INSTANCE.CredDeleteA(target, new DWORD(1), new DWORD(0));
+			success = Advapi32.INSTANCE.CredDeleteA(target, 1, 0);
 		} else {
 			byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_16LE);
 			Memory passwordMemory = new Memory(passwordBytes.length);
@@ -89,7 +88,7 @@ public class WinCredentialKeyring implements Keyring {
 			cred.CredentialBlobSize = passwordBytes.length;
 			cred.Persist = 2;
 
-			success = Advapi32.INSTANCE.CredWriteA(cred, new DWORD(0));
+			success = Advapi32.INSTANCE.CredWriteA(cred, 0);
 			passwordMemory.clear();
 		}
 
@@ -100,7 +99,22 @@ public class WinCredentialKeyring implements Keyring {
 		}
 	}
 
-	private String errorCodeToMessage(int errorCode) {
-		return "Error code: " + errorCode; // TODO get message from Windows API
+	private static String errorCodeToMessage(int errorCode) {
+		PointerByReference buffer = new PointerByReference();
+		int nLen = Kernel32.INSTANCE.FormatMessageA(
+				Kernel32.FORMAT_MESSAGE_ALLOCATE_BUFFER
+						| Kernel32.FORMAT_MESSAGE_FROM_SYSTEM
+						| Kernel32.FORMAT_MESSAGE_IGNORE_INSERTS,
+				null, errorCode, 0, buffer, 0, null);
+
+		if (nLen == 0)
+			return "Error code: " + errorCode;
+
+		Pointer ptr = buffer.getValue();
+		try {
+			return ptr.getString(0).trim();
+		} finally {
+			Kernel32.INSTANCE.LocalFree(ptr);
+		}
 	}
 }

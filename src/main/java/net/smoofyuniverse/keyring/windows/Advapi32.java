@@ -2,7 +2,6 @@ package net.smoofyuniverse.keyring.windows;
 
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
-import com.sun.jna.platform.win32.WinDef.DWORD;
 import com.sun.jna.ptr.PointerByReference;
 import net.smoofyuniverse.keyring.util.NativeUtil;
 
@@ -21,30 +20,20 @@ public interface Advapi32 extends Library {
 	 * @param Credential credential pointer
 	 * @return success or failure.
 	 */
-	boolean CredReadA(
-			String TargetName,
-			DWORD Type,
-			DWORD Flags,
-			PointerByReference Credential
-	);
+	boolean CredReadA(String TargetName, int Type, int Flags, PointerByReference Credential);
 
 	/**
 	 * @param Credential credential pointer
 	 * @param Flags      always zero
 	 * @return success or failure.
 	 */
-	boolean CredWriteA(
-			CREDENTIAL Credential,
-			DWORD Flags
-	);
+	boolean CredWriteA(CREDENTIAL Credential, int Flags);
 
 	/**
 	 * @param Credential who's memory we'll free.
 	 * @return success or failure.
 	 */
-	boolean CredFree(
-			Pointer Credential
-	);
+	boolean CredFree(Pointer Credential);
 
 	/**
 	 * @param TargetName name of credential in store
@@ -52,9 +41,5 @@ public interface Advapi32 extends Library {
 	 * @param Flags      always zero
 	 * @return success or failure.
 	 */
-	boolean CredDeleteA(
-			String TargetName,
-			DWORD Type,
-			DWORD Flags
-	);
+	boolean CredDeleteA(String TargetName, int Type, int Flags);
 }
