@@ -3,7 +3,6 @@ package net.smoofyuniverse.keyring;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.security.SecureRandom;
 
 import static org.junit.Assert.*;
@@ -13,10 +12,6 @@ import static org.junit.Assert.*;
  */
 public class KeyringTest {
 	public static final String SERVICE = "java-keyring", ACCOUNT = "test";
-
-	public static Keyring createTestKeyring() throws Exception {
-		return Keyring.create(Files.createTempFile("keystore", ".keystore"));
-	}
 
 	public static String randomPassword(SecureRandom r) {
 		byte[] bytes = new byte[20];
@@ -29,7 +24,7 @@ public class KeyringTest {
 	 */
 	@Test
 	public void testCreate() throws Exception {
-		Keyring keyring = createTestKeyring();
+		Keyring keyring = Keyring.create();
 		assertNotNull(keyring);
 	}
 
@@ -38,7 +33,7 @@ public class KeyringTest {
 	 */
 	@Test
 	public void testGetBackendName() throws Exception {
-		Keyring keyring = createTestKeyring();
+		Keyring keyring = Keyring.create();
 		assertNotNull(keyring.getBackendName());
 	}
 
@@ -47,7 +42,7 @@ public class KeyringTest {
 	 */
 	@Test
 	public void testRemoveGetPassword() throws Exception {
-		Keyring keyring = createTestKeyring();
+		Keyring keyring = Keyring.create();
 		keyring.setPassword(SERVICE, ACCOUNT, null);
 		assertNull(keyring.getPassword(SERVICE, ACCOUNT));
 	}
@@ -57,7 +52,7 @@ public class KeyringTest {
 	 */
 	@Test
 	public void testSetGetPassword() throws Exception {
-		Keyring keyring = createTestKeyring();
+		Keyring keyring = Keyring.create();
 		String password = randomPassword(new SecureRandom());
 		keyring.setPassword(SERVICE, ACCOUNT, password);
 		assertEquals(password, keyring.getPassword(SERVICE, ACCOUNT));
@@ -69,7 +64,7 @@ public class KeyringTest {
 	 */
 	@Test
 	public void testMultipleSetGetPassword() throws Exception {
-		Keyring keyring = createTestKeyring();
+		Keyring keyring = Keyring.create();
 		SecureRandom r = new SecureRandom();
 		for (int i = 0; i < 100; i++) {
 			String password = r.nextBoolean() ? null : randomPassword(r);

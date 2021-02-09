@@ -1,11 +1,9 @@
 package net.smoofyuniverse.keyring;
 
 import com.sun.jna.Platform;
-import net.smoofyuniverse.keyring.gnome.GNOMEKeyring;
+import net.smoofyuniverse.keyring.linux.SecretServiceKeyring;
 import net.smoofyuniverse.keyring.osx.OSXKeyring;
 import net.smoofyuniverse.keyring.windows.WinCredentialKeyring;
-
-import java.nio.file.Path;
 
 /**
  * A keyring.
@@ -15,16 +13,15 @@ public interface Keyring {
 	/**
 	 * Creates a keyring for the current OS.
 	 *
-	 * @param keyStore The key store.
 	 * @return The keyring.
 	 * @throws UnsupportedBackendException if there is no backend available.
 	 */
-	static Keyring create(Path keyStore) throws UnsupportedBackendException {
+	static Keyring create() throws UnsupportedBackendException {
 		switch (Platform.getOSType()) {
 			case Platform.MAC:
 				return new OSXKeyring();
 			case Platform.LINUX:
-				return new GNOMEKeyring(keyStore);
+				return new SecretServiceKeyring();
 			case Platform.WINDOWS:
 			case Platform.WINDOWSCE:
 				return new WinCredentialKeyring();
