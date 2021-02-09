@@ -4,7 +4,6 @@ import com.sun.jna.Pointer;
 import net.smoofyuniverse.keyring.Keyring;
 import net.smoofyuniverse.keyring.PasswordAccessException;
 import net.smoofyuniverse.keyring.UnsupportedBackendException;
-import net.smoofyuniverse.keyring.util.ServiceAccountPair;
 
 import java.nio.charset.StandardCharsets;
 
@@ -31,7 +30,8 @@ public class OSXKeyring implements Keyring {
 
 	@Override
 	public String getPassword(String service, String account) throws PasswordAccessException {
-		ServiceAccountPair.validate(service, account);
+		Keyring.validateService(service);
+		Keyring.validateAccount(account);
 
 		byte[] serviceBytes = service.getBytes(StandardCharsets.UTF_8),
 				accountBytes = account.getBytes(StandardCharsets.UTF_8);
@@ -57,7 +57,9 @@ public class OSXKeyring implements Keyring {
 
 	@Override
 	public void setPassword(String service, String account, String password) throws PasswordAccessException {
-		ServiceAccountPair.validate(service, account);
+		Keyring.validateService(service);
+		Keyring.validateAccount(account);
+		Keyring.validatePassword(password);
 
 		byte[] serviceBytes = service.getBytes(StandardCharsets.UTF_8),
 				accountBytes = account.getBytes(StandardCharsets.UTF_8);

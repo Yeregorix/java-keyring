@@ -56,4 +56,39 @@ public interface Keyring {
 	 * @throws PasswordAccessException if any exception occurs while saving the password.
 	 */
 	void setPassword(String service, String account, String password) throws PasswordAccessException;
+
+	/**
+	 * Validates the service.
+	 * The service must be non-null and not empty.
+	 *
+	 * @param service The service.
+	 */
+	static void validateService(String service) {
+		if (service == null)
+			throw new IllegalArgumentException("service is null");
+		if (service.isEmpty())
+			throw new IllegalArgumentException("service is empty");
+	}
+
+	/**
+	 * Validates the account.
+	 * The account must be non-null.
+	 *
+	 * @param account The account.
+	 */
+	static void validateAccount(String account) {
+		if (account == null)
+			throw new IllegalArgumentException("account is null");
+	}
+
+	/**
+	 * Validates the password.
+	 * The password must not contains a NULL character.
+	 *
+	 * @param password The password.
+	 */
+	static void validatePassword(String password) {
+		if (password != null && password.indexOf('\0') != -1)
+			throw new IllegalArgumentException("password contains a NULL character");
+	}
 }

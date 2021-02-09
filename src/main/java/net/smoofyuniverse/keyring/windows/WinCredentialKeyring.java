@@ -6,7 +6,6 @@ import com.sun.jna.ptr.PointerByReference;
 import net.smoofyuniverse.keyring.Keyring;
 import net.smoofyuniverse.keyring.PasswordAccessException;
 import net.smoofyuniverse.keyring.UnsupportedBackendException;
-import net.smoofyuniverse.keyring.util.ServiceAccountPair;
 
 import java.nio.charset.StandardCharsets;
 
@@ -42,7 +41,8 @@ public class WinCredentialKeyring implements Keyring {
 
 	@Override
 	public String getPassword(String service, String account) throws PasswordAccessException {
-		ServiceAccountPair.validate(service, account);
+		Keyring.validateService(service);
+		Keyring.validateAccount(account);
 
 		PointerByReference ref = new PointerByReference();
 		boolean success = Advapi32.INSTANCE.CredReadA(getTargetName(service, account), new DWORD(1L), new DWORD(0L), ref);
@@ -67,7 +67,9 @@ public class WinCredentialKeyring implements Keyring {
 
 	@Override
 	public void setPassword(String service, String account, String password) throws PasswordAccessException {
-		ServiceAccountPair.validate(service, account);
+		Keyring.validateService(service);
+		Keyring.validateAccount(account);
+		Keyring.validatePassword(password);
 
 		String target = getTargetName(service, account);
 		boolean success;

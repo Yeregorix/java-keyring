@@ -6,9 +6,18 @@ import net.smoofyuniverse.keyring.Keyring;
 import net.smoofyuniverse.keyring.PasswordAccessException;
 import net.smoofyuniverse.keyring.UnsupportedBackendException;
 
+/**
+ * A keyring using Freedesktop Secret Service.
+ * See https://wiki.gnome.org/Projects/Libsecret
+ */
 public class SecretServiceKeyring implements Keyring {
 	private final SecretSchema schema;
 
+	/**
+	 * Creates a new keyring using Freedesktop Secret Service.
+	 *
+	 * @throws UnsupportedBackendException if the backend for this implementation is not available.
+	 */
 	public SecretServiceKeyring() throws UnsupportedBackendException {
 		if (GLib.INSTANCE == null || Libsecret.INSTANCE == null)
 			throw new UnsupportedBackendException("Failed to load native libraries");
@@ -40,6 +49,9 @@ public class SecretServiceKeyring implements Keyring {
 
 	@Override
 	public String getPassword(String service, String account) throws PasswordAccessException {
+		Keyring.validateService(service);
+		Keyring.validateAccount(account);
+
 		PointerByReference error = new PointerByReference();
 		Pointer password = Libsecret.INSTANCE.secret_password_lookup_sync(this.schema, null, error,
 				"service", service, "account", account, null);
@@ -56,6 +68,10 @@ public class SecretServiceKeyring implements Keyring {
 
 	@Override
 	public void setPassword(String service, String account, String password) throws PasswordAccessException {
+		Keyring.validateService(service);
+		Keyring.validateAccount(account);
+		Keyring.validatePassword(password);
+
 		PointerByReference error = new PointerByReference();
 
 		if (password == null) {
