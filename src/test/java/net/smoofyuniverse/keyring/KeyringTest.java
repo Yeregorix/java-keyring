@@ -16,6 +16,12 @@ public class KeyringTest {
 	public static String randomPassword(SecureRandom r) {
 		byte[] bytes = new byte[20];
 		r.nextBytes(bytes);
+
+		for (int i = 0; i < bytes.length; i++) {
+			if (bytes[i] == 0)
+				bytes[i] = (byte) r.nextInt();
+		}
+
 		return new String(bytes, StandardCharsets.UTF_8);
 	}
 
