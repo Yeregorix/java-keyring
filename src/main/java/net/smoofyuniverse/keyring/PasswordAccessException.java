@@ -13,4 +13,8 @@ public class PasswordAccessException extends Exception {
 		super(message, cause);
 	}
 
+	public PasswordAccessException(Throwable cause) {
+		super(cause);
+	}
+
 }

@@ -55,10 +55,13 @@ public class WinCredentialKeyring implements Keyring {
 
 		CREDENTIAL cred = new CREDENTIAL(ref.getValue());
 		try {
+			if (cred.CredentialBlobSize == 0)
+				return "";
+
 			byte[] passwordBytes = cred.CredentialBlob.getByteArray(0, cred.CredentialBlobSize);
 			return new String(passwordBytes, StandardCharsets.UTF_16LE);
 		} catch (Exception e) {
-			throw new PasswordAccessException(e.getMessage());
+			throw new PasswordAccessException(e);
 		} finally {
 			Advapi32.INSTANCE.CredFree(ref.getValue());
 		}
@@ -77,8 +80,14 @@ public class WinCredentialKeyring implements Keyring {
 			success = Advapi32.INSTANCE.CredDeleteA(target, 1, 0);
 		} else {
 			byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_16LE);
-			Memory passwordMemory = new Memory(passwordBytes.length);
-			passwordMemory.write(0, passwordBytes, 0, passwordBytes.length);
+
+			Memory passwordMemory;
+			if (passwordBytes.length == 0) {
+				passwordMemory = null;
+			} else {
+				passwordMemory = new Memory(passwordBytes.length);
+				passwordMemory.write(0, passwordBytes, 0, passwordBytes.length);
+			}
 
 			CREDENTIAL cred = new CREDENTIAL();
 			cred.TargetName = target;
@@ -89,7 +98,9 @@ public class WinCredentialKeyring implements Keyring {
 			cred.Persist = 2;
 
 			success = Advapi32.INSTANCE.CredWriteA(cred, 0);
-			passwordMemory.clear();
+
+			if (passwordMemory != null)
+				passwordMemory.clear();
 		}
 
 		if (!success) {

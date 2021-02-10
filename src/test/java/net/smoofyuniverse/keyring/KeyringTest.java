@@ -13,13 +13,14 @@ import static org.junit.Assert.*;
 public class KeyringTest {
 	public static final String SERVICE = "java-keyring", ACCOUNT = "test";
 
-	public static String randomPassword(SecureRandom r) {
-		byte[] bytes = new byte[20];
+	public static String randomPassword(SecureRandom r, int length) {
+		byte[] bytes = new byte[length];
 		r.nextBytes(bytes);
 
-		for (int i = 0; i < bytes.length; i++) {
-			if (bytes[i] == 0)
+		for (int i = 0; i < length; i++) {
+			while (bytes[i] == 0) {
 				bytes[i] = (byte) r.nextInt();
+			}
 		}
 
 		return new String(bytes, StandardCharsets.UTF_8);
@@ -59,7 +60,7 @@ public class KeyringTest {
 	@Test
 	public void testSetGetPassword() throws Exception {
 		Keyring keyring = Keyring.create();
-		String password = randomPassword(new SecureRandom());
+		String password = randomPassword(new SecureRandom(), 20);
 		keyring.setPassword(SERVICE, ACCOUNT, password);
 		assertEquals(password, keyring.getPassword(SERVICE, ACCOUNT));
 	}
@@ -73,7 +74,22 @@ public class KeyringTest {
 		Keyring keyring = Keyring.create();
 		SecureRandom r = new SecureRandom();
 		for (int i = 0; i < 100; i++) {
-			String password = r.nextBoolean() ? null : randomPassword(r);
+			String password = r.nextBoolean() ? null : randomPassword(r, 20);
+			keyring.setPassword(SERVICE, ACCOUNT, password);
+			assertEquals(password, keyring.getPassword(SERVICE, ACCOUNT));
+		}
+	}
+
+	/**
+	 * Sets a random password, then gets it.
+	 * Repeats several times with a length from 0 to 500.
+	 */
+	@Test
+	public void testRangeSetGetPassword() throws Exception {
+		Keyring keyring = Keyring.create();
+		SecureRandom r = new SecureRandom();
+		for (int i = 0; i < 500; i++) {
+			String password = randomPassword(r, i);
 			keyring.setPassword(SERVICE, ACCOUNT, password);
 			assertEquals(password, keyring.getPassword(SERVICE, ACCOUNT));
 		}

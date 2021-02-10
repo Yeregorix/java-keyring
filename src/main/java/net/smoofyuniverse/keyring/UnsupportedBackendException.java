@@ -13,4 +13,8 @@ public class UnsupportedBackendException extends Exception {
 		super(message, cause);
 	}
 
+	public UnsupportedBackendException(Throwable cause) {
+		super(cause);
+	}
+
 }
