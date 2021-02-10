@@ -1,11 +1,11 @@
-package net.smoofyuniverse.keyring.osx;
+package net.smoofyuniverse.keyring.mac;
 
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 import net.smoofyuniverse.keyring.util.NativeUtil;
 
 /**
- * OS X Security library.
+ * MacOS Security library.
  */
 public interface SecurityLib extends Library {
 	SecurityLib INSTANCE = NativeUtil.loadOrNull("Security", SecurityLib.class);

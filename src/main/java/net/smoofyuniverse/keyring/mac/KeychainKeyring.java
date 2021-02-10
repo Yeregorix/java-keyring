@@ -1,4 +1,4 @@
-package net.smoofyuniverse.keyring.osx;
+package net.smoofyuniverse.keyring.mac;
 
 import com.sun.jna.Pointer;
 import net.smoofyuniverse.keyring.Keyring;
@@ -8,24 +8,24 @@ import net.smoofyuniverse.keyring.UnsupportedBackendException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * A keyring using OS X Keychain.
+ * A keyring using MacOS Keychain.
  * See https://developer.apple.com/documentation/security/keychain_services/keychain_items
  */
-public class OSXKeyring implements Keyring {
+public class KeychainKeyring implements Keyring {
 
 	/**
-	 * Creates a new keyring using OS X Keychain.
+	 * Creates a new keyring using MacOS Keychain.
 	 *
 	 * @throws UnsupportedBackendException if the backend for this implementation is not available.
 	 */
-	public OSXKeyring() throws UnsupportedBackendException {
+	public KeychainKeyring() throws UnsupportedBackendException {
 		if (CoreFoundationLib.INSTANCE == null || SecurityLib.INSTANCE == null)
 			throw new UnsupportedBackendException("Failed to load native libraries");
 	}
 
 	@Override
 	public String getBackendName() {
-		return "OS X Keychain";
+		return "MacOS Keychain";
 	}
 
 	@Override

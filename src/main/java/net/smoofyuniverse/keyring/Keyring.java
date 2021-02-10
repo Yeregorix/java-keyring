@@ -2,7 +2,7 @@ package net.smoofyuniverse.keyring;
 
 import com.sun.jna.Platform;
 import net.smoofyuniverse.keyring.linux.SecretServiceKeyring;
-import net.smoofyuniverse.keyring.osx.OSXKeyring;
+import net.smoofyuniverse.keyring.mac.KeychainKeyring;
 import net.smoofyuniverse.keyring.windows.WinCredentialKeyring;
 
 /**
@@ -19,7 +19,7 @@ public interface Keyring {
 	static Keyring create() throws UnsupportedBackendException {
 		switch (Platform.getOSType()) {
 			case Platform.MAC:
-				return new OSXKeyring();
+				return new KeychainKeyring();
 			case Platform.LINUX:
 				return new SecretServiceKeyring();
 			case Platform.WINDOWS:
