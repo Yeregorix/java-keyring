@@ -13,14 +13,14 @@ import java.nio.charset.StandardCharsets;
  * A keyring using Windows Credential Manager.
  * See https://docs.microsoft.com/fr-fr/windows/win32/api/wincred
  */
-public class WinCredentialKeyring implements Keyring {
+public class CredentialManagerKeyring implements Keyring {
 
 	/**
 	 * Creates a new keyring using Windows Credential Manager.
 	 *
 	 * @throws UnsupportedBackendException if the backend for this implementation is not available.
 	 */
-	public WinCredentialKeyring() throws UnsupportedBackendException {
+	public CredentialManagerKeyring() throws UnsupportedBackendException {
 		if (Advapi32.INSTANCE == null || Kernel32.INSTANCE == null)
 			throw new UnsupportedBackendException("Failed to load native libraries");
 	}

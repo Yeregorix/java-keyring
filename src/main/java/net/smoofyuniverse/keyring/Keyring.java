@@ -3,7 +3,7 @@ package net.smoofyuniverse.keyring;
 import com.sun.jna.Platform;
 import net.smoofyuniverse.keyring.linux.SecretServiceKeyring;
 import net.smoofyuniverse.keyring.mac.KeychainKeyring;
-import net.smoofyuniverse.keyring.windows.WinCredentialKeyring;
+import net.smoofyuniverse.keyring.windows.CredentialManagerKeyring;
 
 /**
  * A keyring.
@@ -24,7 +24,7 @@ public interface Keyring {
 				return new SecretServiceKeyring();
 			case Platform.WINDOWS:
 			case Platform.WINDOWSCE:
-				return new WinCredentialKeyring();
+				return new CredentialManagerKeyring();
 			default:
 				throw new UnsupportedBackendException("Unsupported OS");
 		}
