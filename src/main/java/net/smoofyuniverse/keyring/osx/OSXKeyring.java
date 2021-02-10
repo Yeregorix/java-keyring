@@ -86,12 +86,16 @@ public class OSXKeyring implements Keyring {
 			} finally {
 				CoreFoundationLib.INSTANCE.CFRelease(itemRef[0]);
 			}
-		} else if (password != null) { // set
-			byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8);
-			status = SecurityLib.INSTANCE.SecKeychainAddGenericPassword(
-					Pointer.NULL, serviceBytes.length, serviceBytes,
-					accountBytes.length, accountBytes,
-					passwordBytes.length, passwordBytes, null);
+		} else {
+			if (password == null) { // skip
+				status = 0;
+			} else { // set
+				byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8);
+				status = SecurityLib.INSTANCE.SecKeychainAddGenericPassword(
+						null, serviceBytes.length, serviceBytes,
+						accountBytes.length, accountBytes,
+						passwordBytes.length, passwordBytes, null);
+			}
 		}
 
 		if (status != 0)
