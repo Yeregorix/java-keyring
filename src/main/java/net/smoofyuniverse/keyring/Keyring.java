@@ -68,6 +68,8 @@ public interface Keyring {
 			throw new IllegalArgumentException("service is null");
 		if (service.isEmpty())
 			throw new IllegalArgumentException("service is empty");
+		if (service.indexOf('\0') != -1)
+			throw new IllegalArgumentException("service contains a null character");
 	}
 
 	/**
@@ -79,6 +81,8 @@ public interface Keyring {
 	static void validateAccount(String account) {
 		if (account == null)
 			throw new IllegalArgumentException("account is null");
+		if (account.indexOf('\0') != -1)
+			throw new IllegalArgumentException("account contains a null character");
 	}
 
 	/**
@@ -89,6 +93,6 @@ public interface Keyring {
 	 */
 	static void validatePassword(String password) {
 		if (password != null && password.indexOf('\0') != -1)
-			throw new IllegalArgumentException("password contains a NULL character");
+			throw new IllegalArgumentException("password contains a null character");
 	}
 }
