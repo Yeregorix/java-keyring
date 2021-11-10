@@ -23,8 +23,8 @@ repositories {
 }
 
 dependencies {
-    api 'net.java.dev.jna:jna:5.6.0'
-    testImplementation 'junit:junit:4.13.1'
+    api 'net.java.dev.jna:jna:5.9.0'
+    testImplementation 'junit:junit:4.13.2'
 }
 
 test {
